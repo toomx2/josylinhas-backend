@@ -1,0 +1,82 @@
+html,
+body {
+    width: 100%;
+    min-height: 100vh;
+}
+
+html,
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+ol,
+form,
+figure,
+blockquote,
+dl,
+dd {
+    font-size: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    line-height: 1.5;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul,
+ol {
+    padding: 0;
+    list-style: none;
+}
+
+input,
+button,
+textarea,
+select {
+    font: inherit;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+    box-shadow: 0 0 0px 1000px rgba(247, 198, 209, 0.05) inset !important;
+    -webkit-text-fill-color: var(--juvania-color-dark) !important;
+    color: var(--juvania-color-dark) !important;
+    transition: background-color 5000s ease-in-out 0s;
+    -webkit-transition: background-color 5000s ease-in-out 0s;
+}
+
+:focus-visible {
+    outline: 2px solid highlight;
+    outline-offset: 2px;
+}
+
+html:focus-within {
+    scroll-behavior: smooth;
+}
