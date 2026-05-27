@@ -1,4 +1,7 @@
 import "./Footer.css";
+
+import { Link } from "react-router-dom";
+
 import JosylinhasLogo from "../assets/josylinhas-logo.png";
 
 function Footer() {
@@ -55,33 +58,33 @@ function Footer() {
 
                             <ul className="josylinhas-menu">
                                 <li>
-                                    <a className="footer-link" href="#">
+                                    <Link className="footer-link" to="/">
                                         Home
-                                    </a>
+                                    </Link>
                                 </li>
 
                                 <li>
-                                    <a className="footer-link" href="#">
+                                    <Link className="footer-link" to="/produtos">
                                         Produtos
-                                    </a>
+                                    </Link>
                                 </li>
 
                                 <li>
-                                    <a className="footer-link" href="#">
+                                    <Link className="footer-link" to="/blog">
                                         Blog
-                                    </a>
+                                    </Link>
                                 </li>
 
                                 <li>
-                                    <a className="footer-link" href="#">
+                                    <Link className="footer-link" to="/parcerias">
                                         Parcerias
-                                    </a>
+                                    </Link>
                                 </li>
 
                                 <li>
-                                    <a className="footer-link" href="#">
+                                    <Link className="footer-link" to="/sobre">
                                         Sobre
-                                    </a>
+                                    </Link>
                                 </li>
                             </ul>
 

@@ -1,6 +1,7 @@
 import "./Header.css";
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 import JosylinhasLogo from "../assets/josylinhas-logo.png";
 
@@ -11,13 +12,13 @@ const Header = () => {
         <header className="josylinhas-header">
             <nav className="josylinhas-navbar">
                 <div className="josylinhas-logo">
-                    <a href="/">
+                    <Link to="/">
                         <img className="josylinhas-logo"
                             src={JosylinhasLogo}
                             width="100"
                             height="100"
                             alt="Josylinhas Logotipo" />
-                    </a>
+                    </Link>
                 </div>
 
                 <div className="josylinhas-menu">
@@ -28,33 +29,33 @@ const Header = () => {
 
                     <ul className={`navbar-menu ${menuOpen ? "active" : ""}`}>
                         <li>
-                            <a className="josylinhas-link" href="#">
+                            <Link className="josylinhas-link" to="/">
                                 Home
-                            </a>
+                            </Link>
                         </li>
 
                         <li>
-                            <a className="josylinhas-link" href="#">
+                            <Link className="josylinhas-link" to="/produtos">
                                 Produtos
-                            </a>
+                            </Link>
                         </li>
 
                         <li>
-                            <a className="josylinhas-link" href="#">
+                            <Link className="josylinhas-link" to="/blog">
                                 Blog
-                            </a>
+                            </Link>
                         </li>
 
                         <li>
-                            <a className="josylinhas-link" href="#">
+                            <Link className="josylinhas-link" to="/parcerias">
                                 Parcerias
-                            </a>
+                            </Link>
                         </li>
 
                         <li>
-                            <a className="josylinhas-link" href="#">
+                            <Link className="josylinhas-link" to="/sobre">
                                 Sobre
-                            </a>
+                            </Link>
                         </li>
                     </ul>
 
