@@ -32,8 +32,8 @@ const Sobre = () => {
                     </div>
                 </div>
 
-                <div class="row row-cols-1 mb-5">
-                    <div class="d-flex flex-column gap-3 mb-4 px-4">
+                <div className="row row-cols-1 mb-5">
+                    <div className="d-flex flex-column gap-3 mb-4 px-4">
                         <p>
                             O Josylinhas é muito mais do que um ateliê de costura: é um espaço onde a arte, a criatividade e a responsabilidade caminham juntas. Fundado por Joseli, uma apaixonada pela moda e pelo carnaval, nosso propósito é transformar tecidos em histórias, costuras em sonhos e figurinos em experiências  beleza e inclusão. Nosso público é diverso, formado por pessoas que acreditam que vestir-se é uma forma de expressão e que a moda pode ser consciente e sustentável.
                         </p>
@@ -43,8 +43,8 @@ const Sobre = () => {
                         </p>
                     </div>
 
-                    <div class="d-flex justify-content-center">
-                        <img class="img-fluid" 
+                    <div className="d-flex justify-content-center">
+                        <img className="img-fluid" 
                              src={CostumePicture}
                              alt="Foto de um Avô com seu Neto" />
                     </div>
