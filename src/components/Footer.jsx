@@ -10,7 +10,7 @@ function Footer() {
         <footer className="josylinhas-footer">
 
             <div className="footer-main">
-                <div className="row">
+                <div className="row gap-3">
 
                     <div className="col-md">
 
