@@ -1,6 +1,6 @@
 import "./App.css";
 
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } from 'react-router-dom';
 
 import Layout from "./components/Layout";
 
@@ -13,24 +13,24 @@ import Artigo from "./pages/Artigo";
 import Parcerias from "./pages/Parcerias";
 import Sobre from "./pages/Sobre";
 
+const josylinhasRoutes = createBrowserRouter(
+    createRoutesFromElements(
+        <Route path="/" element={<Layout />}>
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/login" element={<Login />} />
+            <Route element={<Home />} index />
+            <Route path="/produtos" element={<Produtos />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/artigo" element={<Artigo />} />
+            <Route path="/parcerias" element={<Parcerias />} />
+            <Route path="/sobre" element={<Sobre />} />
+        </Route>
+    )
+);
+
 const App = () => {
     return (
-        <BrowserRouter>
-
-            <Routes>
-                <Route path="/" element={<Layout />}>
-                    <Route path="/admin" element={<Admin />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route element={<Home />} index />
-                    <Route path="/produtos" element={<Produtos />} />
-                    <Route path="/blog" element={<Blog />} />
-                    <Route path="/artigo" element={<Artigo />} />
-                    <Route path="/parcerias" element={<Parcerias />} />
-                    <Route path="/sobre" element={<Sobre />} />
-                </Route>
-            </Routes>
-
-        </BrowserRouter>
+        <RouterProvider router={josylinhasRoutes} />
     );
 };
 
