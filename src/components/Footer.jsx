@@ -114,6 +114,7 @@ function Footer() {
                                         name="email"
                                         type="email"
                                         placeholder="E-Mail"
+                                        autoComplete="email"
                                     />
 
                                     <button
