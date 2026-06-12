@@ -1,0 +1,99 @@
+/* Josylinhas Header */
+
+.josylinhas-header {
+    background-color: var(--josylinhas-color-light);
+    position: sticky;
+    top: 0;
+    height: var(--josylinhas-header-height);
+    box-shadow: rgb(0 0 0 / 50%) 0px 13px 30px -12px;
+    z-index: 7;
+}
+
+.josylinhas-logo {
+    width: var(--josylinhas-logo-size);
+    height: auto;
+}
+
+.josylinhas-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.menu-icon {
+    display: block;
+    color: var(--josylinhas-color-primary);
+    cursor: pointer;
+    font-size: 2.5rem;
+}
+
+.josylinhas-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    height: 100%;
+    padding: 0 1rem;
+}
+
+.navbar-menu {
+    background-color: var(--josylinhas-color-light);
+    display: none;
+    position: absolute;
+    top: var(--josylinhas-header-height);
+    left: 0;
+    right: 0;
+    gap: 0.5rem;
+    padding: 1rem;
+    margin: 0;
+    list-style: none;
+    border-bottom: 1px solid var(--josylinhas-color-primary);
+    box-shadow: 0 8px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-menu.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Responsividade */
+
+@media(min-width: 768px) {
+
+    /* Josylinhas Header */
+
+    .josylinhas-header {
+        border-bottom: 1px solid var(--josylinhas-color-primary);
+    }
+
+    .josylinhas-navbar {
+        justify-content: flex-start;
+    }
+
+    .josylinhas-menu {
+        flex-direction: row;
+        flex-grow: 1;
+    }
+
+    .menu-icon {
+        display: none;
+    }
+
+    .navbar-menu {
+        background-color: transparent;
+        position: static;
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
+        align-items: center;
+        gap: 1rem;
+        border: none;
+        padding: 0;
+        box-shadow: none;
+    }
+
+    .navbar-menu.active {
+        flex-direction: row;
+    }
+
+}

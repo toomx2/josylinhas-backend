@@ -1,0 +1,43 @@
+.card-background {
+    background: #F8F8F8;
+}
+
+.card-img-custom {
+    width: 10rem;
+    height: 10rem;
+    object-fit: contain;
+}
+
+.carousel-arrow {
+    color: var(--josylinhas-color-dark);
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    height: 100%;
+}
+
+.image-section {
+    display: flex;
+    justify-content: center;
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+}
+
+.carousel-img {
+    display: block;
+    width: 15rem;
+    height: auto;
+    object-fit: contain;
+}
+
+@media (min-width: 576px) {
+    .carousel-img {
+        width: auto;
+        height: 15rem;
+    }
+
+    .carousel-arrow {
+        align-items: center;
+    }
+}
