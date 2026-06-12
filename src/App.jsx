@@ -13,9 +13,11 @@ import Artigo from "./pages/Artigo";
 import Parcerias from "./pages/Parcerias";
 import Sobre from "./pages/Sobre";
 
+import ErrorBoundary from "./components/ErrorBoundary";
+
 const josylinhasRoutes = createBrowserRouter(
     createRoutesFromElements(
-        <Route path="/" element={<Layout />}>
+        <Route path="/" element={<Layout />} errorElement={<ErrorBoundary />}>
             <Route path="/admin" element={<Admin />} />
             <Route path="/login" element={<Login />} />
             <Route element={<Home />} index />
