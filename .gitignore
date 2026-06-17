@@ -10,7 +10,9 @@ npm-debug.log*
 Thumbs.db
 .DS_Store
 .directory
-.env*
+.env
+.env.*
+!.env.example
 *~
 *.local
 *.log
