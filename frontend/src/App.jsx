@@ -5,6 +5,7 @@ import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } 
 import Layout from "./components/Layout";
 
 import Admin from "./pages/Admin";
+import Cadastrar from "./pages/Cadastrar";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Produtos from "./pages/Produtos";
@@ -19,6 +20,7 @@ const josylinhasRoutes = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<Layout />} errorElement={<ErrorBoundary />}>
             <Route path="/admin" element={<Admin />} />
+            <Route path="/cadastrar" element={<Cadastrar />} />
             <Route path="/login" element={<Login />} />
             <Route element={<Home />} index />
             <Route path="/produtos" element={<Produtos />} />
