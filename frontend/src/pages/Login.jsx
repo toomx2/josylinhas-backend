@@ -36,7 +36,7 @@ const Login = () => {
                            required />
 
                     <div className="text-end mt-1">
-                        <Link className="form-link" to="#">
+                        <Link className="form-link" to="/esqueci-senha">
                             Esqueci a Senha
                         </Link>
                     </div>
