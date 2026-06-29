@@ -51,17 +51,6 @@
     font-size: 1rem;
 }
 
-.btn-primary {
-    background: var(--josylinhas-color-primary);
-    color: var(--josylinhas-color-light);
-    font-size: 0.875rem;
-}
-
-.btn-primary:hover {
-    background: #D4719C;
-    color: var(--josylinhas-color-secondary);
-}
-
 .footer-link {
     color: var(--josylinhas-color-dark);
     text-decoration: none;
@@ -71,7 +60,6 @@
 .footer-link:hover {
     color: var(--josylinhas-color-primary);
 }
-
 
 .social-media {
     display: flex;
