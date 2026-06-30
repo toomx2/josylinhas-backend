@@ -9,6 +9,7 @@ import Cadastrar from "./pages/Cadastrar";
 import Login from "./pages/Login";
 import EsqueciSenha from "./pages/EsqueciSenha";
 import AlterarSenha from "./pages/AlterarSenha";
+import EditarPerfil from "./pages/EditarPerfil";
 import Home from "./pages/Home";
 import Produtos from "./pages/Produtos";
 import Blog from "./pages/Blog";
@@ -26,6 +27,7 @@ const josylinhasRoutes = createBrowserRouter(
             <Route path="/login" element={<Login />} />
             <Route path="/esqueci-senha" element={<EsqueciSenha />} />
             <Route path="/alterar-senha" element={<AlterarSenha />} />
+            <Route path="/editar-perfil" element={<EditarPerfil />} />
             <Route element={<Home />} index />
             <Route path="/produtos" element={<Produtos />} />
             <Route path="/blog" element={<Blog />} />
