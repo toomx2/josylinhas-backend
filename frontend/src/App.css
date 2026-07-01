@@ -39,6 +39,59 @@ body {
     background-repeat: no-repeat;
 }
 
+.josylinhas-password {
+    position: relative;
+}
+
+.josylinhas-password input {
+    padding-right: calc(0.75rem + 2.5rem);
+}
+
+.josylinhas-password input:focus~.password-toggle {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.password-toggle {
+    background: none;
+    color: var(--josylinhas-color-primary);
+    position: absolute;
+    top: 50%;
+    right: 0.75rem;
+    transform: translateY(-50%);
+    border: none;
+    cursor: pointer;
+    font-size: 1.25rem;
+    transition: 0.25s;
+    z-index: 6;
+}
+
+.password-toggle:hover {
+    color: #D4719C;
+}
+
+.password-toggle.is-invalid {
+    color: #E65D60;
+    outline-color: #E65D60;
+    right: 2rem;
+    top: 1.25rem;
+}
+
+.password-toggle.is-invalid:hover {
+    color: #CC5C5E;
+}
+
+.password-toggle:focus {
+    outline: 1px solid var(--josylinhas-color-primary);
+    border-radius: 0.375rem;
+}
+
+.password-toggle:focus-within,
+.password-toggle:active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 /* Josylinhas Utilities */
 
     /* Font */
