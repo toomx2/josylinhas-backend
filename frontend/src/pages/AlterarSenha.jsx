@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 
+import PasswordInput from "../components/PasswordInput";
+
 const AlterarSenha = () => {
     return (
         <div className="admin-background d-flex flex-grow-1 justify-content-center align-items-center">
@@ -10,32 +12,9 @@ const AlterarSenha = () => {
                     Alterar Senha
                 </h1>
 
-                <div>
-                    <label className="form-label" htmlFor="new-password">
-                        Nova Senha *
-                    </label>
+                <PasswordInput label="Nova Senha *" id="new-password" name="newPassword" autoComplete="new-password" minLength={8} required />
 
-                    <input className="form-control"
-                           id="new-password"
-                           name="newPassword"
-                           type="password"
-                           autoComplete="new-password"
-                           minLength="8"
-                           required />
-                </div>
-
-                <div>
-                    <label className="form-label" htmlFor="repeat-password">
-                        Repetir Senha *
-                    </label>
-
-                    <input className="form-control"
-                           id="repeat-password"
-                           name="repeatPassword"
-                           type="password"
-                           autoComplete="new-password"
-                           required />
-                </div>
+                <PasswordInput label="Repetir Senha *" id="repeat-password" name="repeatPassword" autoComplete="new-password" required />
 
                 <div className="d-flex justify-content-center mt-3">
                     <button className="josylinhas-btn form-btn" type="submit">

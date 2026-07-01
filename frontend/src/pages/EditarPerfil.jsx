@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 
+import PasswordInput from "../components/PasswordInput";
+
 const EditarPerfil = () => {
     return (
         <div className="admin-background d-flex flex-grow-1 justify-content-center align-items-center">
@@ -36,31 +38,9 @@ const EditarPerfil = () => {
                            required />
                 </div>
 
-                <div>
-                    <label className="form-label" htmlFor="password">
-                        Senha
-                    </label>
+                <PasswordInput label="Senha" id="password" name="password" autoComplete="new-password" required />
 
-                    <input className="form-control"
-                           id="password"
-                           name="password"
-                           type="password"
-                           autoComplete="new-password"
-                           required />
-                </div>
-
-                <div>
-                    <label className="form-label" htmlFor="confirm-password">
-                        Confirmar Senha
-                    </label>
-
-                    <input className="form-control"
-                           id="confirm-password"
-                           name="confirmPassword"
-                           type="password"
-                           autoComplete="new-password"
-                           required />
-                </div>
+                <PasswordInput label="Confirmar Senha" id="confirm-password" name="confirmPassword" autoComplete="new-password" required />
 
                 <div>
                     <label className="form-label" htmlFor="secret-question">

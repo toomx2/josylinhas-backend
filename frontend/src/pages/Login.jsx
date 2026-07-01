@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 
+import PasswordInput from "../components/PasswordInput";
+
 const Login = () => {
     return (
         <div className="admin-background d-flex flex-grow-1 justify-content-center align-items-center">
@@ -24,16 +26,7 @@ const Login = () => {
                 </div>
 
                 <div>
-                    <label className="form-label" htmlFor="password">
-                        Senha
-                    </label>
-
-                    <input className="form-control"
-                           id="password"
-                           name="password"
-                           type="password"
-                           autoComplete="current-password"
-                           required />
+                    <PasswordInput label="Senha" id="password" name="password" autoComplete="current-password" required />
 
                     <div className="text-end mt-1">
                         <Link className="form-link" to="/esqueci-senha">
