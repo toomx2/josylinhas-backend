@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import PasswordInput from "../components/PasswordInput";
+import PasswordStrength from "../components/PasswordStrength";
 
 import { profileValidation } from "../validations/profileValidation";
 
@@ -101,6 +102,8 @@ const EditarPerfil = () => {
                                value={formData.password}
                                onChange={handleChange}
                                error={errors.password} />
+
+                <PasswordStrength password={formData.password} />
 
                 <PasswordInput label="Confirmar Senha"
                                id="confirm-password"
