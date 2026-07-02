@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import PasswordInput from "../components/PasswordInput";
+import PasswordStrength from "../components/PasswordStrength";
 
 import { resetPasswordValidation } from "../validations/resetPasswordValidation";
 
@@ -59,6 +60,8 @@ const AlterarSenha = () => {
                                value={formData.newPassword}
                                onChange={handleChange}
                                error={errors.newPassword} />
+
+                <PasswordStrength password={formData.newPassword} />
 
                 <PasswordInput label="Repetir Senha *"
                                id="repeat-password"
