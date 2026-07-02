@@ -5,6 +5,7 @@ import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } 
 import Layout from "./components/Layout";
 
 import Admin from "./pages/Admin";
+import ListaUsuarios from "./pages/ListaUsuarios";
 import Cadastrar from "./pages/Cadastrar";
 import Login from "./pages/Login";
 import EsqueciSenha from "./pages/EsqueciSenha";
@@ -23,6 +24,7 @@ const josylinhasRoutes = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<Layout />} errorElement={<ErrorBoundary />}>
             <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/usuarios" element={<ListaUsuarios />} />
             <Route path="/cadastrar" element={<Cadastrar />} />
             <Route path="/login" element={<Login />} />
             <Route path="/esqueci-senha" element={<EsqueciSenha />} />

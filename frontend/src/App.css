@@ -92,6 +92,47 @@ body {
     pointer-events: auto;
 }
 
+.search-section {
+    position: relative;
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+
+.search-input {
+    border-top-left-radius: 0.375rem;
+    border-bottom-left-radius: 0.375rem;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.search-section > .search-input {
+    position: relative;
+    flex: 1 1 auto;
+    width: 1%;
+    min-width: 0;
+}
+
+.search-button {
+    background-color: var(--josylinhas-color-primary);
+    color: var(--josylinhas-color-light);
+    border: none;
+    width: 4rem;
+    transition: 0.25s;
+}
+
+.search-button:hover {
+    background-color: #D4719C;
+}
+
+.search-section > .search-button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+}
+
 /* Josylinhas Utilities */
 
     /* Font */
@@ -236,5 +277,9 @@ body {
 
     .form-btn {
         --josylinhas-btn-padding-x: 3rem;
+    }
+
+    .search-button {
+        width: 8rem;
     }
 }
