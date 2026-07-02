@@ -1,10 +1,48 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
+import { forgotPasswordValidation } from "../validations/forgotPasswordValidation";
+
 const EsqueciSenha = () => {
+
+    const [formData, setFormData] = useState({
+        email: ""
+    });
+
+    const [errors, setErrors] = useState({});
+
+    function handleChange(event) {
+        const { name, value } = event.target;
+
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+
+        setErrors(prev => ({
+            ...prev,
+            [name]: ""
+        }));
+    }
+
+    function handleSubmit(event) {
+        event.preventDefault();
+
+        const validationErrors = forgotPasswordValidation(formData);
+
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        setErrors({});
+    }
+
     return (
         <div className="admin-background d-flex flex-grow-1 justify-content-center align-items-center">
 
-            <form className="form-card shadow my-3 mx-2">
+            <form className="form-card shadow my-3 mx-2"
+                  onSubmit={handleSubmit}>
 
                 <h1 className="form-title">
                     Esqueci a Senha
@@ -19,12 +57,18 @@ const EsqueciSenha = () => {
                         E-Mail
                     </label>
 
-                    <input className="form-control"
+                    <input className={`form-control ${errors.email ? "is-invalid" : ""}`}
                            id="email"
                            name="email"
                            type="email"
                            autoComplete="email"
-                           required />
+                           value={formData.email}
+                           onChange={handleChange} />
+
+                    {errors.email &&
+                        <p className="small text-danger">
+                            {errors.email}
+                        </p>}
                 </div>
 
                 <div className="d-flex justify-content-center mt-3">
@@ -39,6 +83,7 @@ const EsqueciSenha = () => {
             </form>
         </div>
     );
+
 };
 
 export default EsqueciSenha;
