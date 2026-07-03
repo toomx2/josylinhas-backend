@@ -1,5 +1,7 @@
+import axios from "axios";
+
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 import PasswordInput from "../components/PasswordInput";
 import PasswordStrength from "../components/PasswordStrength";
@@ -7,6 +9,8 @@ import PasswordStrength from "../components/PasswordStrength";
 import { registerValidation } from "../validations/registerValidation";
 
 const Cadastrar = () => {
+
+    const navigate = useNavigate();
 
     const initialData = {
         name: "",
@@ -42,7 +46,7 @@ const Cadastrar = () => {
         }));
     }
 
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault();
 
         const validationErrors = registerValidation(formData);
@@ -53,6 +57,27 @@ const Cadastrar = () => {
         }
 
         setErrors({});
+
+        try {
+
+            const payload = {
+                name: formData.name,
+                email: formData.email,
+                password: formData.password,
+                secretQuestion: formData.secretQuestion,
+                questionAnswer: formData.questionAnswer
+            };
+
+            const res = await axios.post("http://localhost:5000/cadastrar-admin", payload);
+
+            if (res.status === 201) {
+                setFormData(initialData);
+                navigate("/login");
+            }
+
+        } catch (error) {
+            console.log("Ocorreu Um Erro:", error);
+        }
     }
 
     return (
