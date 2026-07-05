@@ -30,7 +30,7 @@ const josylinhasRoutes = createBrowserRouter(
             <Route path="/cadastrar" element={<Cadastrar />} />
             <Route path="/login" element={<Login />} />
             <Route path="/esqueci-senha" element={<EsqueciSenha />} />
-            <Route path="/alterar-senha" element={<AlterarSenha />} />
+            <Route path="/alterar-senha/:token" element={<AlterarSenha />} />
             <Route path="/editar-perfil" element={<EditarPerfil />} />
             <Route element={<Home />} index />
             <Route path="/produtos" element={<Produtos />} />

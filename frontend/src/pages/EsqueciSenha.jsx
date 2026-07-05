@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -10,6 +12,7 @@ const EsqueciSenha = () => {
     });
 
     const [errors, setErrors] = useState({});
+    const [message, setMessage] = useState("");
 
     function handleChange(event) {
         const { name, value } = event.target;
@@ -25,7 +28,7 @@ const EsqueciSenha = () => {
         }));
     }
 
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault();
 
         const validationErrors = forgotPasswordValidation(formData);
@@ -33,6 +36,19 @@ const EsqueciSenha = () => {
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
             return;
+        }
+
+        try {
+
+            const res = await axios.post(
+                "http://localhost:5000/esqueci-senha",
+                formData
+            );
+
+            setMessage(res.data.message);
+
+        } catch (error) {
+            console.error("Erro ao solicitar recuperação de senha:", error);
         }
 
         setErrors({});
@@ -47,6 +63,12 @@ const EsqueciSenha = () => {
                 <h1 className="form-title">
                     Esqueci a Senha
                 </h1>
+
+                {message && (
+                    <p className="small text-success mb-3">
+                        {message}
+                    </p>
+                )}
 
                 <p className="text-muted small mb-3">
                     Sem problemas. Insira seu endereço de e-mail e enviaremos um link para criar uma nova senha.
