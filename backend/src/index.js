@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 
 import database from "./config/database.js";
 
-dotenv.config({ path: path.resolve(process.cwd(), "../.env") });
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
