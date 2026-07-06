@@ -1,11 +1,15 @@
+import axios from "axios";
+
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 import PasswordInput from "../components/PasswordInput";
 
 import { loginValidation } from "../validations/loginValidation";
 
 const Login = () => {
+
+    const navigate = useNavigate();
 
     const initialData = {
         email: "",
@@ -29,7 +33,7 @@ const Login = () => {
         }));
     }
 
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault();
 
         const validationErrors = loginValidation(formData);
@@ -40,6 +44,27 @@ const Login = () => {
         }
 
         setErrors({});
+
+        try {
+
+            const payload = {
+                email: formData.email,
+                password: formData.password
+            };
+
+            const res = await axios.post(
+                "http://localhost:5000/login",
+                payload,
+                { withCredentials: true }
+            );
+
+            if (res.status === 200) {
+                navigate("/admin");
+            }
+
+        } catch (error) {
+            console.error("Erro na tentativa de login:", error);
+        }
     }
 
     return (
