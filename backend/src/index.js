@@ -20,6 +20,50 @@ app.get("/", (req, res) => {
     res.send("Servidor Rodando...");
 });
 
+app.get("/admin/usuarios", async (req, res) => {
+
+    try {
+
+        const sql =
+            `
+            SELECT id, 
+                  nome AS name,
+                  email,
+                  cargo AS role,
+                  ativo AS active,
+                  criado_em AS created_at
+            FROM usuarios;
+        `;
+
+        const [rows] = await database.execute(sql);
+
+        const dateTime = new Intl.DateTimeFormat("pt-BR", {
+            timeZone: "America/Sao_Paulo",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        });
+
+        const users = rows.map(user => {
+            if (user.created_at) {
+                const createdAt = new Date(user.created_at);
+                user.created_at = dateTime.format(createdAt);
+            }
+            return user;
+        });
+
+        return res.status(201).json(users);
+
+    } catch (error) {
+        console.error("Erro ao buscar usuários no banco:", error);
+
+        return res.status(500).json({
+            message: "Erro interno no servidor."
+        });
+    }
+
+});
+
 app.post("/cadastrar-admin", async (req, res) => {
 
     try {

@@ -1,53 +1,33 @@
+import axios from "axios";
+
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const ListaUsuarios = () => {
 
-    const users = [
-        {
-            id: 1,
-            name: "Amora Fernandes",
-            email: "amora.dfernandes@gmail.com",
-            active: true,
-            role: "Admin",
-            created_at: "28/06/2026",
-        },
+    const [users, setUsers] = useState([]);
 
-        {
-            id: 2,
-            name: "Luiz Eduardo",
-            email: "luiz.esalbuquerque@gmail.com",
-            active: true,
-            role: "Admin",
-            created_at: "28/06/2026",
-        },
+    const [loading, setLoading] = useState(true);
 
-        {
-            id: 3,
-            name: "Mariana Prescinato",
-            email: "mariana.sprescinato@gmail.com",
-            active: true,
-            role: "Admin",
-            created_at: "28/06/2026",
-        },
+    useEffect(() => {
+        const getUsers = async () => {
+    
+            try {
 
-        {
-            id: 4,
-            name: "Victor Emanuel",
-            email: "victor.esrocha@gmail.com",
-            active: true,
-            role: "Admin",
-            created_at: "28/06/2026",
-        },
+                const res = await axios.get("http://localhost:5000/admin/usuarios");
 
-        {
-            id: 5,
-            name: "Wecton Soares",
-            email: "wecton.scarvalho@gmail.com",
-            active: false,
-            role: "Usuário",
-            created_at: "28/06/2026",
-        },
-    ];
+                if(res.data) {
+                    setUsers(res.data);
+                }
+
+            } catch (error) {
+                console.error("Erro ao carregar usuários:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        getUsers();
+    }, []);
 
     function isAdmin(id) {
         const user = users.find(user => user.id === id);
@@ -90,78 +70,87 @@ const ListaUsuarios = () => {
                     </div>
 
                     <div className="table-responsive">
-                        <table className="table table-striped table-hover p-3">
-                            <thead>
-                                <tr>
-                                    <th scope="col">
-                                        ID
-                                    </th>
+                        {
+                            loading ?
+                                (
+                                    <p className="text-center py-4">
+                                        Carregando Usuários...
+                                    </p>
+                                ) : (
+                                    <table className="table table-striped table-hover p-3">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    ID
+                                                </th>
 
-                                    <th scope="col">
-                                        Nome
-                                    </th>
+                                                <th scope="col">
+                                                    Nome
+                                                </th>
 
-                                    <th scope="col">
-                                        E-Mail
-                                    </th>
+                                                <th scope="col">
+                                                    E-Mail
+                                                </th>
 
-                                    <th scope="col">
-                                        Cargo
-                                    </th>
+                                                <th scope="col">
+                                                    Cargo
+                                                </th>
 
-                                    <th scope="col">
-                                        Cadastro
-                                    </th>
+                                                <th scope="col">
+                                                    Cadastro
+                                                </th>
 
-                                    <th scope="col">
-                                        Status
-                                    </th>
+                                                <th scope="col">
+                                                    Status
+                                                </th>
 
-                                    <th scope="col">
-                                        Gerenciar
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {users.map((user) => (
-                                    <tr key={user.id}>
-                                        <td>
-                                            {user.id}
-                                        </td>
+                                                <th scope="col">
+                                                    Gerenciar
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {users.map((user) => (
+                                                <tr key={user.id}>
+                                                    <td>
+                                                        {user.id}
+                                                    </td>
 
-                                        <td>
-                                            {user.name}
-                                        </td>
+                                                    <td>
+                                                        {user.name}
+                                                    </td>
 
-                                        <td>
-                                            {user.email}
-                                        </td>
+                                                    <td>
+                                                        {user.email}
+                                                    </td>
 
-                                        <td>
-                                            <span className={`badge ${isAdmin(user.id) ? "text-bg-warning" : "text-bg-primary"}`}>
-                                                {user.role}
-                                            </span>
-                                        </td>
+                                                    <td>
+                                                        <span className={`badge ${isAdmin(user.id) ? "text-bg-warning" : "text-bg-primary"}`}>
+                                                            {user.role}
+                                                        </span>
+                                                    </td>
 
-                                        <td>
-                                            {user.created_at}
-                                        </td>
+                                                    <td>
+                                                        {user.created_at}
+                                                    </td>
 
-                                        <td>
-                                            <span className={`badge ${user.active  ? "text-bg-success" : "text-bg-secondary"}`}>
-                                                {user.active ? "Ativo" : "Inativo"}
-                                            </span>
-                                        </td>
+                                                    <td>
+                                                        <span className={`badge ${user.active ? "text-bg-success" : "text-bg-secondary"}`}>
+                                                            {user.active ? "Ativo" : "Inativo"}
+                                                        </span>
+                                                    </td>
 
-                                        <td>
-                                            <button className="btn btn-danger" title="Bloquear">
-                                                <span className="bi bi-ban" />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                                    <td>
+                                                        <button className="btn btn-danger" title="Bloquear">
+                                                            <span className="bi bi-ban" />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                )
+                        }
                     </div>
 
                     <Link className="link-secondary small my-3" to="/admin">
