@@ -10,12 +10,15 @@ import nodemailer from "nodemailer";
 
 import database from "./config/database.js";
 
+import { authMiddleware } from "./middlewares/authMiddleware.js";
+import { adminMiddleware } from "./middlewares/adminMiddleware.js";
+
 dotenv.config();
 
 const app = express();
 const storeSession = mysqlSession(session);
 
-const frontEndUrl = process.env.APP_URL || "http://localhost:5173/";
+const frontEndUrl = (process.env.APP_URL || "http://localhost:5173").replace(/\/$/, "");
 const port = process.env.PORT || 5000;
 
 const isProduction = process.env.APP_ENV === "production"
@@ -62,7 +65,10 @@ app.get("/", (req, res) => {
     res.send("Servidor Rodando...");
 });
 
-app.get("/admin/usuarios", async (req, res) => {
+app.get("/admin/usuarios",
+        authMiddleware,
+        adminMiddleware,
+        async (req, res) => {
 
     try {
 
@@ -178,7 +184,7 @@ app.post("/login", async (req, res) => {
 
         const [rows] = await database.query(
             `
-                SELECT id, email, senha AS password
+                SELECT id, email, senha AS password, cargo AS role
                 FROM usuarios
                 WHERE email = ?
             `,
@@ -203,14 +209,16 @@ app.post("/login", async (req, res) => {
   
         req.session.user = {
             id: users.id,
-            email: users.email
+            email: users.email,
+            role: users.role
         };
 
         return res.status(200).json({
             message: "Login realizado com sucesso!",
             user: {
                 id: users.id,
-                email: users.email
+                email: users.email,
+                role: users.role
             }
         });
 
