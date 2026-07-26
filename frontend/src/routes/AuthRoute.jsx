@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../services/api";
 
 import { useState, useEffect } from "react";
 import { useLocation, Navigate, Outlet } from "react-router-dom";
@@ -13,10 +13,7 @@ const AuthRoute = () => {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                await axios.get(
-                    "http://localhost:5000/me",
-                    { withCredentials: true }
-                );
+                await api.get("/me");
                 setAuthenticated(true);
             } catch (error) {
                 setAuthenticated(false);

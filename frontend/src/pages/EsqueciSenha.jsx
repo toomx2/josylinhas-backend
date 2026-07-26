@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../services/api";
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -40,10 +40,7 @@ const EsqueciSenha = () => {
 
         try {
 
-            const res = await axios.post(
-                "http://localhost:5000/esqueci-senha",
-                formData
-            );
+            const res = await api.post("/esqueci-senha", formData);
 
             setMessage(res.data.message);
 

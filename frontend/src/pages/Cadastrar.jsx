@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../services/api";
 
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -68,7 +68,7 @@ const Cadastrar = () => {
                 questionAnswer: formData.questionAnswer
             };
 
-            const res = await axios.post("http://localhost:5000/cadastrar-admin", payload);
+            const res = await api.post("/cadastrar-admin", payload);
 
             if (res.status === 201) {
                 setFormData(initialData);

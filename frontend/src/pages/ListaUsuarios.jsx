@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../services/api";
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -14,7 +14,7 @@ const ListaUsuarios = () => {
     
             try {
 
-                const res = await axios.get("http://localhost:5000/admin/usuarios");
+                const res = await api.get("/admin/usuarios");
 
                 if(res.data) {
                     setUsers(res.data);

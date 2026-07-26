@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../services/api";
 
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -52,11 +52,7 @@ const Login = () => {
                 password: formData.password
             };
 
-            const res = await axios.post(
-                "http://localhost:5000/login",
-                payload,
-                { withCredentials: true }
-            );
+            const res = await api.post("/login", payload);
 
             if (res.status === 200) {
                 navigate("/admin");

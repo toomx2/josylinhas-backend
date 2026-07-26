@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../services/api";
 
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
@@ -49,8 +49,8 @@ const AlterarSenha = () => {
 
         try {
 
-            const res = await axios.post(
-                "http://localhost:5000/alterar-senha",
+            const res = await api.post(
+                "/alterar-senha",
                 {
                     token,
                     ...formData
