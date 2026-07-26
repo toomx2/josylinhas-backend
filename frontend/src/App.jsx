@@ -29,11 +29,11 @@ const josylinhasRoutes = createBrowserRouter(
             <Route element={<AuthRoute />}>
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/artigos" element={<ListaArtigos />} />
+                <Route path="/cadastrar" element={<Cadastrar />} />
                 <Route path="/admin/usuarios" element={<ListaUsuarios />} />
                 <Route path="/editar-perfil" element={<EditarPerfil />} />
             </Route>
 
-            <Route path="/cadastrar" element={<Cadastrar />} />
             <Route path="/login" element={<Login />} />
             <Route path="/esqueci-senha" element={<EsqueciSenha />} />
             <Route path="/alterar-senha/:token" element={<AlterarSenha />} />

@@ -112,7 +112,10 @@ app.get("/admin/usuarios",
 
 });
 
-app.post("/cadastrar-admin", async (req, res) => {
+app.post("/cadastrar-admin",
+        authMiddleware,
+        adminMiddleware,
+        async (req, res) => {
 
     try {
 
