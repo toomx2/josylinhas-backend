@@ -78,7 +78,7 @@ app.get("/admin/usuarios",
                   nome AS name,
                   email,
                   cargo AS role,
-                  ativo AS active,
+                  status,
                   criado_em AS created_at
             FROM usuarios;
         `;
@@ -112,9 +112,184 @@ app.get("/admin/usuarios",
 
 });
 
-app.post("/cadastrar-admin",
+app.patch("/admin/usuarios/:id/bloquear",
         authMiddleware,
         adminMiddleware,
+        async (req, res) => {
+
+    try {
+
+        const targetUserId = req.params.id;
+        const targetUserRole = targetUserId.role;
+        const loggedInAdminId = req.session.user.id;
+        const loggedInAdminRole = req.session.user.role;
+
+        if (!targetUserId || isNaN(Number(targetUserId))) {
+            return res.status(400).json({
+                message: "ID de usuário inválido."
+            });
+        }
+
+        if (Number(targetUserId) === Number(loggedInAdminId)) {
+            return res.status(400).json({
+                message: "Você não pode bloquear a si mesmo."
+            });
+        }
+
+        const [users] = await database.query(
+            `
+                SELECT id,
+                       nome AS name,
+                       email,
+                       cargo AS role,
+                       status
+                FROM usuarios
+                WHERE id = ?
+                LIMIT 1
+            `,
+            [targetUserId]
+        );
+
+        if (users.length === 0) {
+            return res.status(404).json({
+                message: "Usuário não encontrado."
+            });
+        }
+
+        const targetUser = users[0];
+
+        if (targetUser.status === "Bloqueado") {
+            return res.status(400).json({
+                message: "Usuário já está bloqueado."
+            });
+        }
+
+        const canBlock = (loggedInAdminRole === "SuperAdmin" &&
+                ["Admin", "Usuário"].includes(targetUser.role)) || 
+                    (loggedInAdminRole === "Admin" && targetUser.role === "Usuário");
+
+        if (!canBlock) {
+            return res.status(403).json({
+                message: "Você não tem permissão para bloquear este usuário."
+            });
+        }
+
+        await database.query(
+            `
+                UPDATE usuarios
+                SET status = ?,
+                    bloqueado_em = NOW(),
+                    bloqueado_por = ?
+                WHERE id = ?
+            `,
+            ["Bloqueado", loggedInAdminId, targetUserId]
+        );
+
+        return res.status(200).json({
+            message: "Usuário bloqueado com sucesso."
+        });
+
+    } catch (error) {
+        console.error("Erro ao bloquear usuário:", error);
+
+        return res.status(500).json({
+            message: "Erro interno ao bloquear usuário."
+        });
+    }
+
+});
+
+app.patch("/admin/usuarios/:id/desbloquear",
+        authMiddleware,
+        adminMiddleware,
+        async (req, res) => {
+
+    try {
+
+        const targetUserId = req.params.id;
+        const loggedInAdminId = req.session.user.id;
+        const loggedInAdminRole = req.session.user.role;
+
+        if (!targetUserId || isNaN(Number(targetUserId))) {
+            return res.status(400).json({
+                message: "ID de usuário inválido."
+            });
+        }
+
+        if (Number(targetUserId) === Number(loggedInAdminId)) {
+            return res.status(400).json({
+                message: "Você não pode desbloquear a si mesmo por esta rota."
+            });
+        }
+
+        const [users] = await database.query(
+            `
+                SELECT id,
+                       nome AS name,
+                       email,
+                       cargo as role,
+                       status
+                FROM usuarios
+                WHERE id = ?
+                LIMIT 1
+            `,
+            [targetUserId]
+        );
+
+        if (users.length === 0) {
+            return res.status(404).json({
+                message: "Usuário não encontrado."
+            });
+        }
+
+        const targetUser = users[0];
+
+        if (targetUser.status === "Ativo") {
+            return res.status(400).json({
+                message: "Usuário já está ativo."
+            });
+        }
+
+        if (targetUser.role === "SuperAdmin") {
+            return res.status(403).json({
+                message: "Não é permitido alterar o status de um SuperAdmin."
+            });
+        }
+
+        if (loggedInAdminRole === "Admin" && targetUser.role !== "Usuário") {
+            return res.status(403).json({
+                message: "Administradores só podem desbloquear usuários comuns."
+            });
+        }
+
+        await database.query(
+            `
+                UPDATE usuarios
+                SET status = ?,
+                    bloqueado_em = NULL,
+                    bloqueado_por = NULL
+                WHERE id = ?
+            `,
+            ["Ativo", targetUserId]
+        );
+
+        return res.status(200).json({
+            message: "Usuário desbloqueado com sucesso."
+        });
+
+    } catch (error) {
+        console.error("Erro ao desbloquear usuário:", error);
+
+        return res.status(500).json({
+            message: "Erro interno ao desbloquear usuário."
+        });
+    }
+
+});
+
+app.post("/cadastrar-admin",
+        authMiddleware,
+        adminMiddleware, 
         async (req, res) => {
 
     try {
@@ -187,9 +362,10 @@ app.post("/login", async (req, res) => {
 
         const [rows] = await database.query(
             `
-                SELECT id, email, senha AS password, cargo AS role
+                SELECT id, email, senha AS password, cargo AS role, status
                 FROM usuarios
                 WHERE email = ?
+                LIMIT 1
             `,
             [email]
         );
@@ -209,7 +385,13 @@ app.post("/login", async (req, res) => {
                 message: "E-mail ou senha inválidos."
             });
         }
-  
+
+        if (users.status === "Bloqueado") {
+            return res.status(403).json({
+                message: "Usuário bloqueado. Entre em contato com o suporte."
+            });
+        }
+
         req.session.user = {
             id: users.id,
             email: users.email,

@@ -74,7 +74,7 @@ async function createAdmin() {
                 encryptedPassword,
                 ADMIN_SECRET_QUESTION,
                 encryptedAnswer,
-                "Admin"
+                "SuperAdmin"
             ]
         );
 

@@ -3,35 +3,162 @@ import api from "../services/api";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
+const roles = {
+    superAdmin: "SuperAdmin",
+    admin: "Admin",
+    user: "Usuário"
+};
+
+const userStatus = {
+    active: "Ativo",
+    blocked: "Bloqueado"
+};
+
 const ListaUsuarios = () => {
 
     const [users, setUsers] = useState([]);
-
+    const [currentUser, setCurrentUser] = useState(null);
+    const [actionLoadingId, setActionLoadingId] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const getUsers = async () => {
-    
-            try {
+    async function getUsers() {
+        try {
 
-                const res = await api.get("/admin/usuarios");
+            const res = await api.get("/admin/usuarios");
 
-                if(res.data) {
-                    setUsers(res.data);
-                }
-
-            } catch (error) {
-                console.error("Erro ao carregar usuários:", error);
-            } finally {
-                setLoading(false);
+            if (res.data) {
+                setUsers(res.data);
             }
+
+        } catch (error) {
+            console.error("Erro ao carregar usuários:", error);
+        } finally {
+            setLoading(false);
         }
+    }
+
+    async function getCurrentUser() {
+        try {
+
+            const res = await api.get("/me");
+
+            if (res.data) {
+                setCurrentUser(res.data.user);
+            }
+
+        } catch (error) {
+            console.error("Erro ao identificar usuário logado.", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
         getUsers();
+        getCurrentUser();
     }, []);
 
-    function isAdmin(id) {
-        const user = users.find(user => user.id === id);
-        return user ? user.role === "Admin" : false;
+    function canChangeStatus(targetUser) {
+        if (!currentUser) {
+            return false;
+        }
+
+        if (Number(targetUser.id) === Number(currentUser.id)) {
+            return false;
+        }
+
+        if (targetUser.role === roles.superAdmin) {
+            return false;
+        }
+
+        if (currentUser.role === roles.superAdmin) {
+            return true;
+        }
+
+        if (currentUser.role === roles.admin &&
+            targetUser.role === roles.user) {
+            return true;
+        }
+
+        return false;
+    }
+
+    async function handleBlock(id) {
+        try {
+
+            setActionLoadingId(id);
+
+            await api.patch(`/admin/usuarios/${id}/bloquear`);
+            await getUsers();
+
+        } catch (error) {
+            console.error("Erro ao bloquear usuário:", error);
+        } finally {
+            setActionLoadingId(null);
+        }
+    }
+
+    async function handleUnblock(id) {
+        try {
+
+            setActionLoadingId(id);
+
+            await api.patch(`/admin/usuarios/${id}/desbloquear`);
+            await getUsers();
+
+        } catch (error) {
+            console.error("Erro ao desbloquear usuário:", error);
+        } finally {
+            setActionLoadingId(null);
+        }
+    }
+
+    function getRoleBadgeClass(role) {
+        switch (role) {
+            case roles.superAdmin:
+                return "text-bg-dark";
+            case roles.admin:
+                return "text-bg-warning";
+            case roles.user:
+                return "text-bg-primary";
+            default:
+                return "text-bg-secondary";
+        }
+    }
+
+    function getRoleLabel(role) {
+        switch (role) {
+            case roles.superAdmin:
+                return "Josylinhas";
+            case roles.admin:
+                return "Admin";
+            case roles.user:
+                return "Usuário";
+            default:
+                return "Desconhecido";
+        }
+    }
+
+    function getStatusBadgeClass(status) {
+        switch (status) {
+            case userStatus.active:
+                return "text-bg-success";
+            case userStatus.blocked:
+                return "text-bg-danger";
+            default:
+                return "text-bg-light";
+        }
+    }
+
+    function getStatusLabel(status) {
+        switch (status) {
+            case userStatus.active:
+                return "Ativo";
+            case userStatus.blocked:
+                return "Bloqueado";
+            default:
+                return "Desconhecido";
+        }
     }
 
     return (
@@ -125,8 +252,8 @@ const ListaUsuarios = () => {
                                                     </td>
 
                                                     <td>
-                                                        <span className={`badge ${isAdmin(user.id) ? "text-bg-warning" : "text-bg-primary"}`}>
-                                                            {user.role}
+                                                        <span className={`badge ${getRoleBadgeClass(user.role)}`}>
+                                                            {getRoleLabel(user.role)}
                                                         </span>
                                                     </td>
 
@@ -135,15 +262,31 @@ const ListaUsuarios = () => {
                                                     </td>
 
                                                     <td>
-                                                        <span className={`badge ${user.active ? "text-bg-success" : "text-bg-secondary"}`}>
-                                                            {user.active ? "Ativo" : "Inativo"}
+                                                        <span className={`badge ${getStatusBadgeClass(user.status)}`}>
+                                                            {getStatusLabel(user.status)}
                                                         </span>
                                                     </td>
 
                                                     <td>
-                                                        <button className="btn btn-danger" title="Bloquear">
-                                                            <span className="bi bi-ban" />
-                                                        </button>
+                                                        {
+                                                            canChangeStatus(user) && (
+                                                                <button className={user.status === userStatus.active ? "btn btn-danger" : "btn btn-success"}
+                                                                        type="button"
+                                                                        onClick={() => user.status === userStatus.active ? handleBlock(user.id) : handleUnblock(user.id)}
+                                                                        title={user.status === userStatus.active ? "Bloquear" : "Desbloquear"}
+                                                                        disabled={actionLoadingId === user.id}>
+                                                                    <span className={
+                                                                            actionLoadingId === user.id
+                                                                                ? "spinner-border spinner-border-sm"
+                                                                                : user.status === userStatus.active
+                                                                                    ? "bi bi-ban"
+                                                                                    : "bi bi-unlock"
+                                                                            }
+                                                                            aria-hidden="true"
+                                                                    />
+                                                                </button>
+                                                            )
+                                                        }
                                                     </td>
                                                 </tr>
                                             ))}
