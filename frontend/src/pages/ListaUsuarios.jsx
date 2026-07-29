@@ -18,6 +18,7 @@ const ListaUsuarios = () => {
 
     const [users, setUsers] = useState([]);
     const [currentUser, setCurrentUser] = useState(null);
+    const [search, setSearch] = useState("");
     const [actionLoadingId, setActionLoadingId] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -76,7 +77,7 @@ const ListaUsuarios = () => {
         }
 
         if (currentUser.role === roles.admin &&
-            targetUser.role === roles.user) {
+                targetUser.role === roles.user) {
             return true;
         }
 
@@ -161,6 +162,22 @@ const ListaUsuarios = () => {
         }
     }
 
+    const filteredUsers = users.filter((user) => {
+
+        const searchTerm = search.trim().toLowerCase();
+
+        if (!searchTerm) {
+            return true;
+        }
+
+        return (
+            (user.name || "").toLowerCase().includes(searchTerm) ||
+            (user.email || "").toLowerCase().includes(searchTerm) ||
+            getStatusLabel(user.status).toLowerCase().includes(searchTerm)
+        );
+
+    });
+
     return (
         <div className="admin-background d-flex flex-grow-1 justify-content-center align-items-center">
             <div className="container-fluid">
@@ -171,27 +188,21 @@ const ListaUsuarios = () => {
                     </h1>
 
                     <div className="container pb-5">
-                        <form className="row align-center">
+                        <form className="row align-center"
+                              onSubmit={(event) => event.preventDefault()}>
                             <div className="search-section">
                                 <label className="visually-hidden" htmlFor="search">
                                     Pesquisar
                                 </label>
 
-                                <input className="form-control search-input"
+                                <input className="form-control"
                                        id="search"
                                        name="search"
                                        type="text"
                                        autoComplete="off"
-                                       placeholder="Pesquisar" />
-
-                                <button className="search-button" 
-                                        type="submit"
-                                        title="Pesquisar">
-
-                                    <span className="bi bi-search" 
-                                          aria-hidden="true"> </span>
-
-                                </button>
+                                       placeholder="Pesquisar"
+                                       value={search}
+                                       onChange={(event) => setSearch(event.target.value)} />
                             </div>
                         </form>
                     </div>
@@ -199,45 +210,46 @@ const ListaUsuarios = () => {
                     <div className="table-responsive">
                         {
                             loading ?
-                                (
-                                    <p className="text-center py-4">
-                                        Carregando Usuários...
-                                    </p>
-                                ) : (
-                                    <table className="table table-striped table-hover p-3">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">
-                                                    ID
-                                                </th>
+                            (
+                                <p className="text-center py-4">
+                                    Carregando Usuários...
+                                </p>
+                            ) : (
+                                <table className="table table-striped table-hover p-3">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">
+                                                ID
+                                            </th>
 
-                                                <th scope="col">
-                                                    Nome
-                                                </th>
+                                            <th scope="col">
+                                                Nome
+                                            </th>
 
-                                                <th scope="col">
-                                                    E-Mail
-                                                </th>
+                                            <th scope="col">
+                                                E-Mail
+                                            </th>
 
-                                                <th scope="col">
-                                                    Cargo
-                                                </th>
+                                            <th scope="col">
+                                                Cargo
+                                            </th>
 
-                                                <th scope="col">
-                                                    Cadastro
-                                                </th>
+                                            <th scope="col">
+                                                Cadastro
+                                            </th>
 
-                                                <th scope="col">
-                                                    Status
-                                                </th>
+                                            <th scope="col">
+                                                Status
+                                            </th>
 
-                                                <th scope="col">
-                                                    Gerenciar
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {users.map((user) => (
+                                            <th scope="col">
+                                                Gerenciar
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {filteredUsers.length > 0 ? (
+                                            filteredUsers.map((user) => (
                                                 <tr key={user.id}>
                                                     <td>
                                                         {user.id}
@@ -282,17 +294,24 @@ const ListaUsuarios = () => {
                                                                                     ? "bi bi-ban"
                                                                                     : "bi bi-unlock"
                                                                             }
-                                                                            aria-hidden="true"
+                                                                          aria-hidden="true"
                                                                     />
                                                                 </button>
                                                             )
                                                         }
                                                     </td>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                )
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td className="text-center text-muted py-4" colSpan="7">
+                                                    Nenhum Usuário Encontrado.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            )
                         }
                     </div>
 
