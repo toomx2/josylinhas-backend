@@ -65,9 +65,9 @@ textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
-    box-shadow: 0 0 0px 1000px rgba(247, 198, 209, 0.05) inset !important;
-    -webkit-text-fill-color: var(--juvania-color-dark) !important;
-    color: var(--juvania-color-dark) !important;
+    box-shadow: 0 0 0px 1000px rgba(250, 200, 210, 0.05) inset !important;
+    -webkit-text-fill-color: var(--josylinhas-color-dark) !important;
+    color: var(--josylinhas-color-dark) !important;
     transition: background-color 5000s ease-in-out 0s;
     -webkit-transition: background-color 5000s ease-in-out 0s;
 }
