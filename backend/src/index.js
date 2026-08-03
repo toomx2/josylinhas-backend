@@ -437,6 +437,12 @@ app.get("/me", (req, res) => {
 
 app.post("/logout", (req, res) => {
 
+    if (!req.session) {
+        return res.status(200).json({
+            message: "Nenhuma sessão ativa."
+        });
+    }
+
     req.session.destroy((error) => {
 
         if (error) {
