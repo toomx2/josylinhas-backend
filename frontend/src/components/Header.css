@@ -56,6 +56,14 @@
     flex-direction: column;
 }
 
+.dropdown-menu {
+    background-color: var(--josylinhas-color-light);
+}
+
+.dropdown-item:hover {
+    background-color: #f7f1f0;
+}
+
 /* Responsividade */
 
 @media(min-width: 768px) {
