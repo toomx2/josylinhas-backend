@@ -1,0 +1,48 @@
+
+import api from "../services/api";
+
+import { useState, useEffect } from "react";
+import { Navigate, Outlet } from "react-router-dom";
+
+const GuestRoute = () => {
+
+    const [loading, setLoading] = useState(true);
+    const [authenticated, setAuthenticated] = useState(false);
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                await api.get("/me");
+                setAuthenticated(true);
+            } catch (error) {
+                setAuthenticated(false);
+            } finally {
+                setLoading(false);
+            }
+        };
+        checkAuth();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="d-flex justify-content-center align-items-center flex-grow-1">
+                <p className="fs-5 font-semibold">
+                    Carregando...
+                </p>
+            </div>
+        );
+    }
+
+    if (authenticated) {
+        return (
+            <Navigate
+                to="/"
+                replace
+            />
+        );
+    }
+
+    return <Outlet />
+};
+
+export default GuestRoute;

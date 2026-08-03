@@ -19,24 +19,33 @@ import Artigo from "./pages/Artigo";
 import Parcerias from "./pages/Parcerias";
 import Sobre from "./pages/Sobre";
 
+import AdminRoute from "./routes/AdminRoute";
 import AuthRoute from "./routes/AuthRoute";
+import GuestRoute from "./routes/GuestRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
+
+import NotFound from "./pages/status/NotFound";
 
 const josylinhasRoutes = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<Layout />} errorElement={<ErrorBoundary />}>
 
-            <Route element={<AuthRoute />}>
+            <Route element={<AdminRoute />}>
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/artigos" element={<ListaArtigos />} />
                 <Route path="/cadastrar" element={<Cadastrar />} />
                 <Route path="/admin/usuarios" element={<ListaUsuarios />} />
+            </Route>
+
+            <Route element={<AuthRoute />}>
                 <Route path="/editar-perfil" element={<EditarPerfil />} />
             </Route>
 
-            <Route path="/login" element={<Login />} />
-            <Route path="/esqueci-senha" element={<EsqueciSenha />} />
-            <Route path="/alterar-senha/:token" element={<AlterarSenha />} />
+            <Route element={<GuestRoute />}>
+                <Route path="/login" element={<Login />} />
+                <Route path="/esqueci-senha" element={<EsqueciSenha />} />
+                <Route path="/alterar-senha/:token" element={<AlterarSenha />} />
+            </Route>
 
             <Route element={<Home />} index />
 
@@ -45,6 +54,9 @@ const josylinhasRoutes = createBrowserRouter(
             <Route path="/artigo" element={<Artigo />} />
             <Route path="/parcerias" element={<Parcerias />} />
             <Route path="/sobre" element={<Sobre />} />
+
+            <Route path="/nao-encontrada" element={<NotFound />} />
+            <Route path="*" element={<NotFound />} />
 
         </Route>
     )
