@@ -22,13 +22,13 @@ import Sobre from "./pages/Sobre";
 import AdminRoute from "./routes/AdminRoute";
 import AuthRoute from "./routes/AuthRoute";
 import GuestRoute from "./routes/GuestRoute";
-import ErrorBoundary from "./components/ErrorBoundary";
+import RouteErrorBoundary from "./routes/RouteErrorBoundary";
 
 import NotFound from "./pages/status/NotFound";
 
 const josylinhasRoutes = createBrowserRouter(
     createRoutesFromElements(
-        <Route path="/" element={<Layout />} errorElement={<ErrorBoundary />}>
+        <Route path="/" element={<Layout />} errorElement={<RouteErrorBoundary />}>
 
             <Route element={<AdminRoute />}>
                 <Route path="/admin" element={<Admin />} />

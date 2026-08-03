@@ -1,7 +1,7 @@
-import "./ErrorBoundary.css";
+import "./RouteErrorBoundary.css";
 import { useRouteError, isRouteErrorResponse, Link } from "react-router-dom";
 
-const ErrorBoundary = () => {
+const RouteErrorBoundary = () => {
 
     const error = useRouteError();
 
@@ -47,4 +47,4 @@ const ErrorBoundary = () => {
 
 };
 
-export default ErrorBoundary;
+export default RouteErrorBoundary;
