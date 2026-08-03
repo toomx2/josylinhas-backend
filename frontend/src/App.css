@@ -190,14 +190,24 @@ body {
     /* Link */
 
 .josylinhas-link {
-    color: var(--josylinhas-color-primary);
+    background-color: var(--josylinhas-link-background);
+    color: var(--josylinhas-link-color) !important;
+    font-size: var(--josylinhas-link-font-size);
     font-weight: 400;
     text-decoration: none;
+    cursor: pointer;
+    border: none;
+    padding: var(--josylinhas-link-padding-y) var(--josylinhas-link-padding-x);
     transition: 0.25s;
 }
 
 .josylinhas-link:hover {
-    color: #D4719C;
+    color: var(--josylinhas-link-hover-color) !important;
+}
+
+.link-primary {
+    --josylinhas-link-color: var(--josylinhas-color-primary);
+    --josylinhas-link-hover-color: #D4719C;
 }
 
 /* Josylinhas Components */

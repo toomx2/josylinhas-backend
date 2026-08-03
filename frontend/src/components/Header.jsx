@@ -29,31 +29,31 @@ const Header = () => {
 
                     <ul className={`navbar-menu ${menuOpen ? "active" : ""}`}>
                         <li>
-                            <Link className="josylinhas-link" to="/">
+                            <Link className="josylinhas-link link-primary" to="/">
                                 Home
                             </Link>
                         </li>
 
                         <li>
-                            <Link className="josylinhas-link" to="/produtos">
+                            <Link className="josylinhas-link link-primary" to="/produtos">
                                 Produtos
                             </Link>
                         </li>
 
                         <li>
-                            <Link className="josylinhas-link" to="/blog">
+                            <Link className="josylinhas-link link-primary" to="/blog">
                                 Blog
                             </Link>
                         </li>
 
                         <li>
-                            <Link className="josylinhas-link" to="/parcerias">
+                            <Link className="josylinhas-link link-primary" to="/parcerias">
                                 Parcerias
                             </Link>
                         </li>
 
                         <li>
-                            <Link className="josylinhas-link" to="/sobre">
+                            <Link className="josylinhas-link link-primary" to="/sobre">
                                 Sobre
                             </Link>
                         </li>
