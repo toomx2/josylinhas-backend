@@ -2,6 +2,7 @@ import api from "../services/api";
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const roles = {
     superAdmin: "SuperAdmin",
@@ -17,10 +18,11 @@ const userStatus = {
 const ListaUsuarios = () => {
 
     const [users, setUsers] = useState([]);
-    const [currentUser, setCurrentUser] = useState(null);
     const [search, setSearch] = useState("");
     const [actionLoadingId, setActionLoadingId] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    const { user } = useAuth();
 
     async function getUsers() {
         try {
@@ -38,33 +40,16 @@ const ListaUsuarios = () => {
         }
     }
 
-    async function getCurrentUser() {
-        try {
-
-            const res = await api.get("/me");
-
-            if (res.data) {
-                setCurrentUser(res.data.user);
-            }
-
-        } catch (error) {
-            console.error("Erro ao identificar usuário logado.", error);
-        } finally {
-            setLoading(false);
-        }
-    }
-
     useEffect(() => {
         getUsers();
-        getCurrentUser();
     }, []);
 
     function canChangeStatus(targetUser) {
-        if (!currentUser) {
+        if (!user) {
             return false;
         }
 
-        if (Number(targetUser.id) === Number(currentUser.id)) {
+        if (Number(targetUser.id) === Number(user.id)) {
             return false;
         }
 
@@ -72,11 +57,11 @@ const ListaUsuarios = () => {
             return false;
         }
 
-        if (currentUser.role === roles.superAdmin) {
+        if (user.role === roles.superAdmin) {
             return true;
         }
 
-        if (currentUser.role === roles.admin &&
+        if (user.role === roles.admin &&
                 targetUser.role === roles.user) {
             return true;
         }

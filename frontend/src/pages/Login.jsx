@@ -1,7 +1,6 @@
-import api from "../services/api";
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 import PasswordInput from "../components/PasswordInput";
 
@@ -16,8 +15,16 @@ const Login = () => {
         password: ""
     };
 
+    const { login } = useAuth();
+
     const [formData, setFormData] = useState(initialData);
     const [errors, setErrors] = useState({});
+
+    function getRedirectPathByRole(role) {
+        const adminRoles = ["Admin", "SuperAdmin"];
+
+        return adminRoles.includes(role) ? "/admin" : "/";
+    }
 
     function handleChange(event) {
         const { name, value } = event.target;
@@ -52,11 +59,12 @@ const Login = () => {
                 password: formData.password
             };
 
-            const res = await api.post("/login", payload);
+            const authUser = await login(payload);
 
-            if (res.status === 200) {
-                navigate("/admin");
-            }
+            navigate(
+                getRedirectPathByRole(authUser?.role),
+                { replace: true }
+            );
 
         } catch (error) {
             console.error("Erro na tentativa de login:", error);

@@ -1,28 +1,10 @@
-import api from "../services/api";
-
-import { useState, useEffect } from "react";
 import { useLocation, Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const AuthRoute = () => {
 
     const currentLocation = useLocation();
-
-    const [loading, setLoading] = useState(true);
-    const [authenticated, setAuthenticated] = useState(false);
-
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                await api.get("/me");
-                setAuthenticated(true);
-            } catch (error) {
-                setAuthenticated(false);
-            } finally {
-                setLoading(false);
-            }
-        };
-        checkAuth();
-    }, []);
+    const { authenticated, loading } = useAuth();
 
     if (loading) {
         return (

@@ -1,6 +1,7 @@
 import "./App.css";
 
 import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } from 'react-router-dom';
+import { AuthProvider } from "./contexts/AuthContext";
 
 import Layout from "./components/Layout";
 
@@ -64,7 +65,9 @@ const josylinhasRoutes = createBrowserRouter(
 
 const App = () => {
     return (
-        <RouterProvider router={josylinhasRoutes} />
+        <AuthProvider>
+            <RouterProvider router={josylinhasRoutes} />
+        </AuthProvider>
     );
 };
 
