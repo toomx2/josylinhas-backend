@@ -201,7 +201,8 @@ body {
     transition: 0.25s;
 }
 
-.josylinhas-link:hover {
+.josylinhas-link:hover,
+.josylinhas-link:focus {
     color: var(--josylinhas-link-hover-color) !important;
 }
 
