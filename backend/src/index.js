@@ -15,6 +15,7 @@ import { adminMiddleware } from "./middlewares/adminMiddleware.js";
 
 import { validateRegister, normalizeRegisterData } from "./validations/registerValidation.js";
 import { validateLogin, normalizeLoginData } from "./validations/loginValidation.js";
+import { validateForgotPassword, normalizeForgotPasswordData } from "./validations/forgotPasswordValidation.js";
 
 dotenv.config();
 
@@ -486,21 +487,23 @@ app.post("/esqueci-senha", async (req, res) => {
 
     try {
 
-        const { email } = req.body;
+        const payload = normalizeForgotPasswordData(req.body);
+        const errors = validateForgotPassword(payload);
+
+        if (Object.keys(errors).length > 0) {
+            return res.status(400).json({
+                message: "Dados inválidos.",
+                errors
+            });
+        }
 
         const successMessage = {
             message: "Se o e-mail existir, enviaremos o passo a passo para redefinir sua senha."
         };
 
-        if (!email) {
-            return res.status(400).json({
-                message: "Informe um e-mail válido."
-            });
-        }
-
         const [users] = await database.query(
             "SELECT * FROM usuarios WHERE email = ?",
-            [email]
+            [payload.email]
         );
 
         if (!users.length) {
@@ -553,7 +556,7 @@ app.post("/esqueci-senha", async (req, res) => {
 
         const info = await transporter.sendMail({
             from: process.env.EMAIL_FROM,
-            to: email,
+            to: payload.email,
             subject: "Recuperar Senha",
             html:
                 `
