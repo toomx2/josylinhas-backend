@@ -13,6 +13,8 @@ import database from "./config/database.js";
 import { authMiddleware } from "./middlewares/authMiddleware.js";
 import { adminMiddleware } from "./middlewares/adminMiddleware.js";
 
+import { validateRegister, normalizeRegisterData } from "./validations/registerValidation.js";
+
 dotenv.config();
 
 const app = express();
@@ -294,18 +296,34 @@ app.post("/cadastrar-admin",
 
     try {
 
-        const {
-            name, email, password, secretQuestion, questionAnswer
-        } = req.body;
+        const payload = normalizeRegisterData(req.body);
+        const errors = validateRegister(payload);
 
-        if (!name || !email || !password || !secretQuestion || !questionAnswer) {
+        if (Object.keys(errors).length > 0) {
             return res.status(400).json({
-                message: "Preencha todos os campos obrigatórios."
+                message: "Dados inválidos.",
+                errors
             });
         }
 
-        const encryptedPassword = await bcrypt.hash(password, 10);
-        const encryptedAnswer = await bcrypt.hash(questionAnswer, 10);
+        const [existingUsers] = await database.execute(
+            `
+                SELECT id
+                FROM usuarios
+                WHERE email = ?
+                LIMIT 1
+            `,
+            [payload.email]
+        );
+
+        if(existingUsers.length > 0) {
+            return res.status(409).json({
+                message: "Este e-mail já está cadastrado."
+            });
+        }
+
+        const encryptedPassword = await bcrypt.hash(payload.password, 10);
+        const encryptedAnswer = await bcrypt.hash(payload.questionAnswer, 10);
 
         const sql =
             `
@@ -324,10 +342,10 @@ app.post("/cadastrar-admin",
         `;
 
         await database.execute(sql, [
-            name,
-            email,
+            payload.name,
+            payload.email,
             encryptedPassword,
-            secretQuestion,
+            payload.secretQuestion,
             encryptedAnswer,
             "Admin"
         ]);
