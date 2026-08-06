@@ -16,6 +16,7 @@ import { adminMiddleware } from "./middlewares/adminMiddleware.js";
 import { validateRegister, normalizeRegisterData } from "./validations/registerValidation.js";
 import { validateLogin, normalizeLoginData } from "./validations/loginValidation.js";
 import { validateForgotPassword, normalizeForgotPasswordData } from "./validations/forgotPasswordValidation.js";
+import { validateResetPassword, normalizeResetPasswordData } from "./validations/resetPasswordValidation.js";
 
 dotenv.config();
 
@@ -594,25 +595,19 @@ app.post("/alterar-senha", async (req, res) => {
 
     try {
 
-        const {
-            token, newPassword, repeatPassword
-        } = req.body;
+        const payload = normalizeResetPasswordData(req.body);
+        const errors = validateResetPassword(payload);
 
-        if (!token || !newPassword || !repeatPassword) {
+        if (Object.keys(errors).length > 0) {
             return res.status(400).json({
-                message: "Token e senha são obrigatórios."
-            });
-        }
-
-        if (newPassword !== repeatPassword) {
-            return res.status(400).json({
-                message: "As senhas não coincidem."
+                message: "Dados inválidos.",
+                errors
             });
         }
 
         const hashedToken = crypto
                 .createHash("sha256")
-                .update(token)
+                .update(payload.token)
                 .digest("hex");
 
         const [tokens] = await database.query(
@@ -635,7 +630,7 @@ app.post("/alterar-senha", async (req, res) => {
 
         const resetToken = tokens[0];
 
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const hashedPassword = await bcrypt.hash(payload.newPassword, 10);
 
         await database.query(
             `
