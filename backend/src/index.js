@@ -14,6 +14,7 @@ import { authMiddleware } from "./middlewares/authMiddleware.js";
 import { adminMiddleware } from "./middlewares/adminMiddleware.js";
 
 import { validateRegister, normalizeRegisterData } from "./validations/registerValidation.js";
+import { validateLogin, normalizeLoginData } from "./validations/loginValidation.js";
 
 dotenv.config();
 
@@ -370,11 +371,13 @@ app.post("/login", async (req, res) => {
 
     try {
 
-        const { email, password } = req.body;
+        const payload = normalizeLoginData(req.body);
+        const errors = validateLogin(payload);
 
-        if (!email || !password) {
+        if (Object.keys(errors).length > 0) {
             return res.status(400).json({
-                message: "Preencha todos os campos obrigatórios."
+                message: "Dados inválidos.",
+                errors
             });
         }
 
@@ -385,7 +388,7 @@ app.post("/login", async (req, res) => {
                 WHERE email = ?
                 LIMIT 1
             `,
-            [email]
+            [payload.email]
         );
 
         if (rows.length === 0) {
@@ -396,7 +399,7 @@ app.post("/login", async (req, res) => {
 
         const users = rows[0];
 
-        const validPassword = await bcrypt.compare(password, users.password)
+        const validPassword = await bcrypt.compare(payload.password, users.password)
     
         if (!validPassword) {
             return res.status(401).json({
