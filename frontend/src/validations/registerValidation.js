@@ -38,7 +38,7 @@ export function registerValidation(data) {
     }
 
     if (!isRequired(data.questionAnswer)) {
-        errors.questionAnswer = "O campo pergunta secreta é obrigatório.";
+        errors.questionAnswer = "O campo resposta secreta é obrigatório.";
     } else if (!isRequired(data.secretQuestion)) {
         errors.questionAnswer = "Nenhuma pergunta foi selecionada.";
     }
