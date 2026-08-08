@@ -164,148 +164,146 @@ const ListaUsuarios = () => {
     });
 
     return (
-        <div className="admin-background d-flex flex-grow-1 justify-content-center align-items-center">
-            <div className="container-fluid">
-                <section className="card card-background my-3 p-3">
+        <div className="container-fluid">
+            <section className="card card-background my-3 p-3">
 
-                    <h1 className="fs-3 fw-semibold text-center py-3">
-                        Usuários
-                    </h1>
+                <h1 className="fs-3 fw-semibold text-center py-3">
+                    Usuários
+                </h1>
 
-                    <div className="container pb-5">
-                        <form className="row align-center"
-                              onSubmit={(event) => event.preventDefault()}>
-                            <div className="search-section">
-                                <label className="visually-hidden" htmlFor="search">
-                                    Pesquisar
-                                </label>
+                <div className="container pb-5">
+                    <form className="row align-center"
+                          onSubmit={(event) => event.preventDefault()}>
+                        <div className="search-section">
+                            <label className="visually-hidden" htmlFor="search">
+                                Pesquisar
+                            </label>
 
-                                <input className="form-control"
-                                       id="search"
-                                       name="search"
-                                       type="text"
-                                       autoComplete="off"
-                                       placeholder="Pesquisar"
-                                       value={search}
-                                       onChange={(event) => setSearch(event.target.value)} />
-                            </div>
-                        </form>
-                    </div>
+                            <input className="form-control"
+                                   id="search"
+                                   name="search"
+                                   type="text"
+                                   autoComplete="off"
+                                   placeholder="Pesquisar"
+                                   value={search}
+                                   onChange={(event) => setSearch(event.target.value)} />
+                        </div>
+                    </form>
+                </div>
 
-                    <div className="table-responsive">
-                        {
-                            loading ?
-                            (
-                                <p className="text-center py-4">
-                                    Carregando Usuários...
-                                </p>
-                            ) : (
-                                <table className="table table-striped table-hover p-3">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">
-                                                ID
-                                            </th>
+                <div className="table-responsive">
+                    {
+                        loading ?
+                        (
+                            <p className="text-center py-4">
+                                Carregando Usuários...
+                            </p>
+                        ) : (
+                            <table className="table table-striped table-hover p-3">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">
+                                            ID
+                                        </th>
 
-                                            <th scope="col">
-                                                Nome
-                                            </th>
+                                        <th scope="col">
+                                            Nome
+                                        </th>
 
-                                            <th scope="col">
-                                                E-Mail
-                                            </th>
+                                        <th scope="col">
+                                            E-Mail
+                                        </th>
 
-                                            <th scope="col">
-                                                Cargo
-                                            </th>
+                                        <th scope="col">
+                                            Cargo
+                                        </th>
 
-                                            <th scope="col">
-                                                Cadastro
-                                            </th>
+                                        <th scope="col">
+                                            Cadastro
+                                        </th>
 
-                                            <th scope="col">
-                                                Status
-                                            </th>
+                                        <th scope="col">
+                                            Status
+                                        </th>
 
-                                            <th scope="col">
-                                                Gerenciar
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {filteredUsers.length > 0 ? (
-                                            filteredUsers.map((user) => (
-                                                <tr key={user.id}>
-                                                    <td>
-                                                        {user.id}
-                                                    </td>
+                                        <th scope="col">
+                                            Gerenciar
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredUsers.length > 0 ? (
+                                        filteredUsers.map((user) => (
+                                            <tr key={user.id}>
+                                                <td>
+                                                    {user.id}
+                                                </td>
 
-                                                    <td>
-                                                        {user.name}
-                                                    </td>
+                                                <td>
+                                                    {user.name}
+                                                </td>
 
-                                                    <td>
-                                                        {user.email}
-                                                    </td>
+                                                <td>
+                                                    {user.email}
+                                                </td>
 
-                                                    <td>
-                                                        <span className={`badge ${getRoleBadgeClass(user.role)}`}>
-                                                            {getRoleLabel(user.role)}
-                                                        </span>
-                                                    </td>
+                                                <td>
+                                                    <span className={`badge ${getRoleBadgeClass(user.role)}`}>
+                                                        {getRoleLabel(user.role)}
+                                                    </span>
+                                                </td>
 
-                                                    <td>
-                                                        {user.created_at}
-                                                    </td>
+                                                <td>
+                                                    {user.created_at}
+                                                </td>
 
-                                                    <td>
-                                                        <span className={`badge ${getStatusBadgeClass(user.status)}`}>
-                                                            {getStatusLabel(user.status)}
-                                                        </span>
-                                                    </td>
+                                                <td>
+                                                    <span className={`badge ${getStatusBadgeClass(user.status)}`}>
+                                                        {getStatusLabel(user.status)}
+                                                    </span>
+                                                </td>
 
-                                                    <td>
-                                                        {
-                                                            canChangeStatus(user) && (
-                                                                <button className={user.status === userStatus.active ? "btn btn-danger" : "btn btn-success"}
-                                                                        type="button"
-                                                                        onClick={() => user.status === userStatus.active ? handleBlock(user.id) : handleUnblock(user.id)}
-                                                                        title={user.status === userStatus.active ? "Bloquear" : "Desbloquear"}
-                                                                        disabled={actionLoadingId === user.id}>
-                                                                    <span className={
-                                                                            actionLoadingId === user.id
-                                                                                ? "spinner-border spinner-border-sm"
-                                                                                : user.status === userStatus.active
-                                                                                    ? "bi bi-ban"
-                                                                                    : "bi bi-unlock"
-                                                                            }
-                                                                          aria-hidden="true"
-                                                                    />
-                                                                </button>
-                                                            )
-                                                        }
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        ) : (
-                                            <tr>
-                                                <td className="text-center text-muted py-4" colSpan="7">
-                                                    Nenhum Usuário Encontrado.
+                                                <td>
+                                                    {
+                                                        canChangeStatus(user) && (
+                                                            <button className={user.status === userStatus.active ? "btn btn-danger" : "btn btn-success"}
+                                                                    type="button"
+                                                                    onClick={() => user.status === userStatus.active ? handleBlock(user.id) : handleUnblock(user.id)}
+                                                                    title={user.status === userStatus.active ? "Bloquear" : "Desbloquear"}
+                                                                    disabled={actionLoadingId === user.id}>
+                                                                <span className={
+                                                                        actionLoadingId === user.id
+                                                                            ? "spinner-border spinner-border-sm"
+                                                                            : user.status === userStatus.active
+                                                                                ? "bi bi-ban"
+                                                                                : "bi bi-unlock"
+                                                                        }
+                                                                        aria-hidden="true"
+                                                                />
+                                                            </button>
+                                                        )
+                                                    }
                                                 </td>
                                             </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            )
-                        }
-                    </div>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td className="text-center text-muted py-4" colSpan="7">
+                                                Nenhum Usuário Encontrado.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        )
+                    }
+                </div>
 
-                    <Link className="link-secondary small my-3" to="/admin">
-                        Dashboard
-                    </Link>
+                <Link className="link-secondary small my-3" to="/admin">
+                    Dashboard
+                </Link>
 
-                </section>
-            </div>
+            </section>
         </div>
     );
 
