@@ -7,17 +7,23 @@ import path from "path";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import fs from "fs/promises";
 import multer from "multer";
 
 import database from "./config/database.js";
 
 import { authMiddleware } from "./middlewares/authMiddleware.js";
 import { adminMiddleware } from "./middlewares/adminMiddleware.js";
+import uploadArticleThumbnail from "./middlewares/uploadArticleThumbnail.js";
+
+import { validateArticleData, normalizeArticleData } from "./validations/articleValidation.js";
 
 import { validateRegister, normalizeRegisterData } from "./validations/registerValidation.js";
 import { validateLogin, normalizeLoginData } from "./validations/loginValidation.js";
 import { validateForgotPassword, normalizeForgotPasswordData } from "./validations/forgotPasswordValidation.js";
 import { validateResetPassword, normalizeResetPasswordData } from "./validations/resetPasswordValidation.js";
+
+import { generateSlug } from "./utilities/generateSlug.js";
 
 dotenv.config();
 
@@ -66,6 +72,31 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 2
     }
 }));
+app.use("/uploads", express.static("uploads"));
+
+async function deleteArticleThumbnail(filename) {
+    if (!filename) {
+        return;
+    }
+
+    try {
+        const safeFilename = path.basename(filename);
+
+        const filePath = path.join(
+            process.cwd(),
+            "uploads",
+            "articles",
+            "thumbnails",
+            safeFilename
+        );
+
+        await fs.unlink(filePath);
+    } catch (error) {
+        if (error.code !== "ENOENT") {
+            console.error("Erro ao remover thumbnail antiga:", error);
+        }
+    }
+}
 
 app.get("/", (req, res) => {
     res.send("Servidor Rodando...");
@@ -115,6 +146,293 @@ app.get("/admin/artigos",
 
     } catch (error) {
         console.error("Erro ao buscar artigos no banco:", error);
+
+        return res.status(500).json({
+            message: "Erro interno no servidor."
+        });
+    }
+
+});
+
+app.post("/admin/artigos",
+        authMiddleware,
+        adminMiddleware,
+        uploadArticleThumbnail.single("thumbnail"),
+        async (req, res) => {
+
+    try {
+
+        const payload = normalizeArticleData(req.body);
+        const errors = validateArticleData(payload);
+
+        if (Object.keys(errors).length > 0) {
+            return res.status(400).json({
+                message: "Dados inválidos.",
+                errors
+            });
+        }
+
+        const authorId = req.session.user.id;
+        const slug = generateSlug(payload.title);
+        const thumbnail = req.file ? req.file.filename : null;
+
+        const [result] = await database.execute(
+            `
+                INSERT INTO artigos
+                (
+                    autor_id,
+                    titulo,
+                    slug,
+                    resumo,
+                    conteudo,
+                    categorias,
+                    imagem_url,
+                    status,
+                    publicado_em
+                )
+                VALUES
+                (
+                    ?, ?, ?, ?, ?, ?, ?, ?,
+                    CASE
+                        WHEN ? = 'Publicado' THEN NOW()
+                        ELSE NULL
+                    END
+                );
+            `,
+            [
+                authorId,
+                payload.title,
+                slug,
+                payload.resume,
+                payload.content,
+                payload.categories || null,
+                thumbnail,
+                payload.status,
+                payload.status
+            ]
+        );
+
+        return res.status(201).json({
+            message: "Artigo cadastrado com sucesso.",
+            articleId: result.insertId
+        });
+
+    } catch (error) {
+        console.error("Erro ao cadastrar artigo:", error);
+
+        return res.status(500).json({
+            message: "Erro interno no servidor."
+        });
+    }
+
+});
+
+app.get("/admin/artigos/:id",
+        authMiddleware,
+        adminMiddleware,
+        async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        const [rows] = await database.execute(
+            `
+                SELECT
+                    id,
+                    titulo AS title,
+                    resumo AS resume,
+                    conteudo AS content,
+                    categorias AS categories,
+                    imagem_url AS thumbnail,
+                    status
+                FROM artigos
+                WHERE id = ?;
+            `,
+            [id]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({
+                message: "Artigo não encontrado."
+            });
+        }
+
+        return res.status(200).json(rows[0]);
+
+    } catch (error) {
+        console.error("Erro ao buscar artigo:", error);
+
+        return res.status(500).json({
+            message: "Erro interno no servidor."
+        });
+    }
+
+});
+
+app.put("/admin/artigos/:id",
+        authMiddleware,
+        adminMiddleware,
+        uploadArticleThumbnail.single("thumbnail"),
+        async (req, res) => {
+
+    let newThumbnail = null;
+
+    try {
+
+        const { id } = req.params;
+
+        const payload = normalizeArticleData(req.body);
+        const errors = validateArticleData(payload);
+
+        if (Object.keys(errors).length > 0) {
+            if (req.file) {
+                await deleteArticleThumbnail(req.file.filename);
+            }
+            return res.status(400).json({
+                message: "Dados inválidos.",
+                errors
+            });
+        }
+
+        newThumbnail = req.file ? req.file.filename : null;
+
+        const [currentRows] = await database.execute(
+            `
+                SELECT imagem_url
+                FROM artigos
+                WHERE id = ?;
+            `,
+            [id]
+        );
+
+        if (currentRows.length === 0) {
+            if (newThumbnail) {
+                await deleteArticleThumbnail(newThumbnail);
+            }
+            return res.status(404).json({
+                message: "Artigo não encontrado."
+            });
+        }
+
+        const oldThumbnail = currentRows[0].imagem_url;
+        const slug = generateSlug(payload.title);
+
+        let sql = 
+        `
+            UPDATE artigos
+            SET
+                titulo = ?,
+                slug = ?,
+                resumo = ?,
+                conteudo = ?,
+                categorias = ?,
+                status = ?,
+                publicado_em = CASE
+                    WHEN publicado_em IS NULL AND ? = 'Publicado'
+                    THEN NOW()
+                    ELSE publicado_em
+                END,
+                atualizado_em = NOW()
+        `;
+
+        const values = [
+            payload.title,
+            slug,
+            payload.resume,
+            payload.content,
+            payload.categories || null,
+            payload.status,
+            payload.status
+        ];
+
+        if (newThumbnail) {
+            sql += `,
+                imagem_url = ?
+            `;
+            values.push(newThumbnail);
+        }
+
+        sql += `
+            WHERE id = ?;
+        `;
+
+        values.push(id);
+
+        await database.execute(sql, values);
+
+        if (newThumbnail && oldThumbnail) {
+            await deleteArticleThumbnail(oldThumbnail);
+        }
+
+        return res.status(200).json({
+            message: "Artigo atualizado com sucesso."
+        });
+
+    } catch (error) {
+        if (newThumbnail) {
+            await deleteArticleThumbnail(newThumbnail);
+        }
+
+        console.error("Erro ao atualizar artigo:", error);
+
+        return res.status(500).json({
+            message: "Erro interno no servidor."
+        });
+    }
+
+});
+
+app.delete("/admin/artigos/:id",
+        authMiddleware,
+        adminMiddleware,
+        async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        const [rows] = await database.execute(
+            `
+                SELECT imagem_url
+                FROM artigos
+                WHERE id = ?;
+            `,
+            [id]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({
+                message: "Artigo não encontrado."
+            });
+        }
+
+        const thumbnail = rows[0].imagem_url;
+
+        const [result] = await database.execute(
+            `
+                DELETE FROM artigos
+                WHERE id = ?;
+            `,
+            [id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                message: "Artigo não encontrado."
+            });
+        }
+
+        if (thumbnail) {
+            await deleteArticleThumbnail(thumbnail);
+        }
+
+        return res.status(200).json({
+            message: "Artigo removido com sucesso."
+        });
+
+    } catch (error) {
+        console.error("Erro ao remover artigo:", error);
 
         return res.status(500).json({
             message: "Erro interno no servidor."

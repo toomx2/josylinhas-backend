@@ -30,6 +30,28 @@ const ListaArtigos = () => {
         getArticles();
     }, []);
 
+    const handleDelete = async (id, title) => {
+        const confirmed = window.confirm(
+            `Tem certeza que deseja excluir o artigo "${title}"?\n\nEsta ação não poderá ser desfeita.`
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            await api.delete(`/admin/artigos/${id}`);
+
+            setArticles((prevArticles) =>
+                prevArticles.filter(
+                    (article) => article.id !== id
+                )
+            );
+        } catch (error) {
+            console.error("Erro ao excluir artigo:", error);
+        }
+    };
+
     function getStatusBadgeClass(status) {
         switch (status) {
             case articleStatus.arquivado:
@@ -100,7 +122,7 @@ const ListaArtigos = () => {
                 </div>
 
                 <div className="d-flex justify-content-end pb-5">
-                    <Link className="btn btn-success" to="#" title="Adicionar">
+                    <Link className="btn btn-success" to="/admin/artigos/novo" title="Adicionar">
                         <span className="bi bi-plus-circle" />
                     </Link>
                 </div>
@@ -176,11 +198,13 @@ const ListaArtigos = () => {
                                                 </td>
 
                                                 <td>
-                                                    <Link className="btn btn-primary me-2 mb-2" to="#" title="Editar">
+                                                    <Link className="btn btn-primary me-2 mb-2" to={`/admin/artigos/editar/${article.id}`} title="Editar">
                                                         <span className="bi bi-pencil-fill" />
                                                     </Link>
 
-                                                    <button className="btn btn-danger mb-2" title="Deletar">
+                                                    <button className="btn btn-danger mb-2"
+                                                            onClick={() => handleDelete(article.id, article.title)}
+                                                            title="Deletar">
                                                         <span className="bi bi-trash-fill" />
                                                     </button>
                                                 </td>
