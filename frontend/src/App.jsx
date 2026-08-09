@@ -9,6 +9,7 @@ import Layout from "./components/Layout";
 
 import Admin from "./pages/Admin";
 import ListaArtigos from "./pages/ListaArtigos";
+import FormArtigo from "./pages/FormArtigo";
 import ListaUsuarios from "./pages/ListaUsuarios";
 
 import AlterarSenha from "./pages/AlterarSenha";
@@ -48,6 +49,16 @@ const josylinhasRoutes = createBrowserRouter([
                     {
                         path: "artigos",
                         element: <ListaArtigos />
+                    },
+
+                    {
+                        path: "artigos/novo",
+                        element: <FormArtigo />
+                    },
+
+                    {
+                        path: "artigos/editar/:id",
+                        element: <FormArtigo />
                     },
 
                     {
