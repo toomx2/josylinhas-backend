@@ -12,6 +12,7 @@ const articleStatus = {
 const ListaArtigos = () => {
 
     const [articles, setArticles] = useState([]);
+    const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(true);
 
     async function getArticles() {
@@ -55,6 +56,20 @@ const ListaArtigos = () => {
         }
     }
 
+    const filteredArticles = articles.filter((article) => {
+        const searchTerm = search.trim().toLowerCase();
+
+        if (!searchTerm) {
+            return true;
+        }
+
+        return (
+            (article.title || "").toLowerCase().includes(searchTerm) ||
+            (article.author || "").toLowerCase().includes(searchTerm) ||
+            getStatusLabel(article.status).toLowerCase().includes(searchTerm)
+        );
+    });
+
     return (
         <div className="container-fluid">
             <section className="card card-background my-3 p-3">
@@ -64,27 +79,22 @@ const ListaArtigos = () => {
                 </h1>
 
                 <div className="container pb-5">
-                    <form className="row align-center">
+                    <form className="row align-center"
+                          onSubmit={(event) => event.preventDefault()}>
                         <div className="search-section">
                             <label className="visually-hidden" htmlFor="search">
                                 Pesquisar
                             </label>
 
-                            <input className="form-control search-input"
+                            <input className="form-control"
                                    id="search"
                                    name="search"
                                    type="text"
                                    autoComplete="off"
-                                   placeholder="Pesquisar" />
-
-                            <button className="search-button"
-                                    type="submit"
-                                    title="Pesquisar">
-
-                                <span className="bi bi-search"
-                                      aria-hidden="true"> </span>
-
-                            </button>
+                                   placeholder="Pesquisar"
+                                   value={search}
+                                   onChange={(event) =>
+                                   setSearch(event.target.value)} />
                         </div>
                     </form>
                 </div>
@@ -136,8 +146,8 @@ const ListaArtigos = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {articles.length > 0 ? (
-                                        articles.map((article) => (
+                                    {filteredArticles.length > 0 ? (
+                                        filteredArticles.map((article) => (
                                             <tr key={article.id}>
                                                 <td>
                                                     {article.id}
