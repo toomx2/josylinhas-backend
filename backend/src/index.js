@@ -7,6 +7,7 @@ import path from "path";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import multer from "multer";
 
 import database from "./config/database.js";
 
@@ -714,6 +715,45 @@ app.post("/alterar-senha", async (req, res) => {
         });
     }
 
+});
+
+app.use((error, req, res, next) => {
+    if (error instanceof multer.MulterError) {
+        if (error.code === "LIMIT_FILE_SIZE") {
+            return res.status(400).json({
+                message: "Dados inválidos.",
+                errors: {
+                    thumbnail: "A thumbnail deve ter no máximo 5 MB."
+                }
+            });
+        }
+
+        return res.status(400).json({
+            message: "Erro no upload da thumbnail.",
+            errors: {
+                thumbnail: "Não foi possível processar a imagem enviada."
+            }
+        });
+    }
+
+    if (error.message === "A thumbnail deve ser uma imagem JPG, PNG ou WEBP.") {
+        return res.status(400).json({
+            message: "Dados inválidos.",
+            errors: {
+                thumbnail: error.message
+            }
+        });
+    }
+
+    next(error);
+});
+
+app.use((error, req, res, next) => {
+    console.error("Erro não tratado:", error);
+
+    return res.status(500).json({
+        message: "Erro interno no servidor."
+    });
 });
 
 app.listen(port, () => {

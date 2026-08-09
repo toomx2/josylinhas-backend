@@ -22,3 +22,7 @@ Thumbs.db
 *.suo
 *.sln
 *.sw?
+
+# Uploads de thumbnails dos artigos
+backend/uploads/articles/thumbnails/*
+!backend/uploads/articles/thumbnails/.gitkeep
