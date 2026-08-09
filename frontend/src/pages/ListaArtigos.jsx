@@ -1,44 +1,58 @@
+import api from "../services/api";
+
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+
+const articleStatus = {
+    arquivado: "Arquivado",
+    publicado: "Publicado",
+    rascunho: "Rascunho"
+};
 
 const ListaArtigos = () => {
 
-    const articles = [
-        {
-            id: 1,
-            title: "Tendência Sustentável: Moda Reciclada em Alta",
-            status: "Publicado",
-            author: "Amora Fernandes",
-            published_on: "10/05/2026",
-            updated_at: "28/06/2026",
-        },
+    const [articles, setArticles] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-        {
-            id: 2,
-            title: "Diversidade nas Passarelas: Moda Inclusiva Ganha Espaço",
-            status: "Rascunho",
-            author: "Victor Emanuel",
-            published_on: null,
-            updated_at: "28/06/2026",
-        },
+    async function getArticles() {
+        try {
+            const res = await api.get("/admin/artigos");
+            setArticles(res.data);
+        } catch (error) {
+            console.error("Erro ao carregar artigos:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
 
-        {
-            id: 3,
-            title: "Figurinos Criativos Transformam o Carnaval em Arte",
-            status: "Rascunho",
-            author: "Mariana Prescinato",
-            published_on: null,
-            updated_at: "28/06/2026",
-        },
-    ];
+    useEffect(() => {
+        getArticles();
+    }, []);
 
-    const statusMap = {
-        "Arquivado": "text-bg-warning",
-        "Publicado": "text-bg-success",
-        "Rascunho": "text-bg-secondary"
-    };
+    function getStatusBadgeClass(status) {
+        switch (status) {
+            case articleStatus.arquivado:
+                return "text-bg-warning";
+            case articleStatus.publicado:
+                return "text-bg-success";
+            case articleStatus.rascunho:
+                return "text-bg-secondary";
+            default:
+                return "text-bg-light";
+        }
+    }
 
-    function getStatus(status) {
-        return statusMap[status] || "text-bg-primary";
+    function getStatusLabel(status) {
+        switch (status) {
+            case articleStatus.arquivado:
+                return "Arquivado";
+            case articleStatus.publicado:
+                return "Publicado";
+            case articleStatus.rascunho:
+                return "Rascunho";
+            default:
+                return "Desconhecido";
+        }
     }
 
     return (
@@ -82,80 +96,97 @@ const ListaArtigos = () => {
                 </div>
 
                 <div className="table-responsive">
-                    <table className="table table-striped table-hover p-3">
-                        <thead>
-                            <tr>
-                                <th scope="col">
-                                    ID
-                                </th>
+                    {
+                        loading ?
+                        (
+                            <p className="text-center py-4">
+                                Carregando Artigos...
+                            </p>
+                        ) : (
+                            <table className="table table-striped table-hover p-3">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">
+                                            ID
+                                        </th>
 
-                                <th scope="col">
-                                    Título
-                                </th>
+                                        <th scope="col">
+                                            Título
+                                        </th>
 
-                                <th scope="col">
-                                    Autor
-                                </th>
+                                        <th scope="col">
+                                            Autor
+                                        </th>
 
-                                <th scope="col">
-                                    Status
-                                </th>
+                                        <th scope="col">
+                                            Status
+                                        </th>
 
-                                <th scope="col">
-                                    Publicado Em
-                                </th>
+                                        <th scope="col">
+                                            Publicado Em
+                                        </th>
 
-                                <th scope="col">
-                                    Atualizado Em
-                                </th>
+                                        <th scope="col">
+                                            Atualizado Em
+                                        </th>
 
-                                <th scope="col">
-                                    Gerenciar
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {articles.map((article) => (
-                                <tr key={article.id}>
-                                    <td>
-                                        {article.id}
-                                    </td>
+                                        <th scope="col">
+                                            Gerenciar
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {articles.length > 0 ? (
+                                        articles.map((article) => (
+                                            <tr key={article.id}>
+                                                <td>
+                                                    {article.id}
+                                                </td>
 
-                                    <td>
-                                        {article.title}
-                                    </td>
+                                                <td>
+                                                    {article.title}
+                                                </td>
 
-                                    <td>
-                                        {article.author}
-                                    </td>
+                                                <td>
+                                                    {article.author}
+                                                </td>
 
-                                    <td>
-                                        <span className={`badge ${getStatus(article.status)}`}>
-                                            {article.status}
-                                        </span>
-                                    </td>
+                                                <td>
+                                                    <span className={`badge ${getStatusBadgeClass(article.status)}`}>
+                                                        {getStatusLabel(article.status)}
+                                                    </span>
+                                                </td>
 
-                                    <td>
-                                        {article.published_on || "—"}
-                                    </td>
+                                                <td>
+                                                    {article.published_on || "—"}
+                                                </td>
 
-                                    <td>
-                                        {article.updated_at}
-                                    </td>
+                                                <td>
+                                                    {article.updated_at || "—"}
+                                                </td>
 
-                                    <td>
-                                        <Link className="btn btn-primary me-2 mb-2" to="#" title="Editar">
-                                            <span className="bi bi-pencil-fill" />
-                                        </Link>
+                                                <td>
+                                                    <Link className="btn btn-primary me-2 mb-2" to="#" title="Editar">
+                                                        <span className="bi bi-pencil-fill" />
+                                                    </Link>
 
-                                        <button className="btn btn-danger mb-2" title="Deletar">
-                                            <span className="bi bi-trash-fill" />
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                                    <button className="btn btn-danger mb-2" title="Deletar">
+                                                        <span className="bi bi-trash-fill" />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td className="text-center text-muted py-4" colSpan="7">
+                                                Nenhum Artigo Encontrado.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        )
+                    }
                 </div>
 
                 <Link className="link-secondary small my-3" to="/admin">

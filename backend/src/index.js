@@ -70,6 +70,58 @@ app.get("/", (req, res) => {
     res.send("Servidor Rodando...");
 });
 
+app.get("/admin/artigos",
+        authMiddleware,
+        adminMiddleware,
+        async (req, res) => {
+
+    try {
+
+        const [rows] = await database.execute(
+            `
+                SELECT
+                    artigos.id,
+                    artigos.titulo AS title,
+                    usuarios.nome AS author,
+                    artigos.status,
+                    artigos.publicado_em AS published_on,
+                    artigos.atualizado_em AS updated_at
+                FROM artigos
+                INNER JOIN usuarios
+                    ON usuarios.id = artigos.autor_id
+                ORDER BY artigos.criado_em DESC;
+            `
+        );
+
+        const dateTime = new Intl.DateTimeFormat("pt-BR", {
+            timeZone: "America/Sao_Paulo",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        });
+
+        const articles = rows.map((article) => ({
+            ...article,
+            published_on: article.published_on
+                ? dateTime.format(new Date(article.published_on))
+                : null,
+            updated_at: article.updated_at
+                ? dateTime.format(new Date(article.updated_at))
+                : null
+        }));
+
+        return res.status(200).json(articles);
+
+    } catch (error) {
+        console.error("Erro ao buscar artigos no banco:", error);
+
+        return res.status(500).json({
+            message: "Erro interno no servidor."
+        });
+    }
+
+});
+
 app.get("/admin/usuarios",
         authMiddleware,
         adminMiddleware,
