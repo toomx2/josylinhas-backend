@@ -1,6 +1,7 @@
 import "./App.css";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 
 import { AuthProvider } from "./contexts/AuthContext";
 
@@ -157,6 +158,11 @@ const App = () => {
     return (
         <AuthProvider>
             <RouterProvider router={josylinhasRoutes} />
+            <ToastContainer
+                position="top-right"
+                theme="light"
+                autoClose={3000}
+            />
         </AuthProvider>
     );
 };
