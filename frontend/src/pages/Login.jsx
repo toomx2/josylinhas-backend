@@ -122,9 +122,6 @@ const Login = () => {
                     </button>
                 </div>
 
-                <Link className="form-link" to="/cadastrar">
-                    Cadastrar-se
-                </Link>
             </form>
         </div>
     );

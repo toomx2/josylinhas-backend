@@ -9,12 +9,12 @@ import AdminLayout from "./components/AdminLayout";
 import Layout from "./components/Layout";
 
 import Admin from "./pages/Admin";
+import CadastrarAdmin from "./pages/CadastrarAdmin";
 import ListaArtigos from "./pages/ListaArtigos";
 import FormArtigo from "./pages/FormArtigo";
 import ListaUsuarios from "./pages/ListaUsuarios";
 
 import AlterarSenha from "./pages/AlterarSenha";
-import Cadastrar from "./pages/Cadastrar";
 import EsqueciSenha from "./pages/EsqueciSenha";
 import EditarPerfil from "./pages/EditarPerfil";
 import Login from "./pages/Login";
@@ -65,6 +65,11 @@ const josylinhasRoutes = createBrowserRouter([
                     {
                         path: "usuarios",
                         element: <ListaUsuarios />
+                    },
+
+                    {
+                        path: "usuarios/novo",
+                        element: <CadastrarAdmin />
                     }
                 ]
             }
@@ -122,11 +127,6 @@ const josylinhasRoutes = createBrowserRouter([
                     {
                         path: "alterar-senha/:token",
                         element: <AlterarSenha />
-                    },
-
-                    {
-                        path: "cadastrar",
-                        element: <Cadastrar />
                     },
 
                     {

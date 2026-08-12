@@ -8,7 +8,7 @@ import PasswordStrength from "../components/PasswordStrength";
 
 import { registerValidation } from "../validations/registerValidation";
 
-const Cadastrar = () => {
+const CadastrarAdmin = () => {
 
     const navigate = useNavigate();
 
@@ -68,7 +68,7 @@ const Cadastrar = () => {
                 questionAnswer: formData.questionAnswer
             };
 
-            const res = await api.post("/cadastrar-admin", payload);
+            const res = await api.post("/admin/usuarios", payload);
 
             if (res.status === 201) {
                 setFormData(initialData);
@@ -87,7 +87,7 @@ const Cadastrar = () => {
                   onSubmit={handleSubmit}>
 
                 <h1 className="form-title">
-                    Cadastrar-se
+                    Novo Admin
                 </h1>
 
                 <div>
@@ -195,12 +195,12 @@ const Cadastrar = () => {
 
                 <div className="d-flex justify-content-center mt-3">
                     <button className="josylinhas-btn form-btn" type="submit">
-                        Cadastrar-se
+                        Cadastrar
                     </button>
                 </div>
 
-                <Link className="form-link" to="/login">
-                    Fazer Login
+                <Link className="form-link" to="/admin/usuarios">
+                    Cancelar
                 </Link>
             </form>
         </div>
@@ -208,4 +208,4 @@ const Cadastrar = () => {
 
 };
 
-export default Cadastrar;
+export default CadastrarAdmin;

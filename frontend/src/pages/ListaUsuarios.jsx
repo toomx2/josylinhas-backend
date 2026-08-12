@@ -191,6 +191,12 @@ const ListaUsuarios = () => {
                     </form>
                 </div>
 
+                <div className="d-flex justify-content-end pb-5">
+                    <Link className="btn btn-success" to="/admin/usuarios/novo" title="Adicionar">
+                        <span className="bi bi-plus-circle" />
+                    </Link>
+                </div>
+
                 <div className="table-responsive">
                     {
                         loading ?

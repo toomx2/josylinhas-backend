@@ -488,6 +488,83 @@ app.get("/admin/usuarios",
 
 });
 
+app.post("/admin/usuarios",
+        authMiddleware,
+        adminMiddleware, 
+        async (req, res) => {
+
+    try {
+
+        const payload = normalizeRegisterData(req.body);
+        const errors = validateRegister(payload);
+
+        if (Object.keys(errors).length > 0) {
+            return res.status(400).json({
+                message: "Dados inválidos.",
+                errors
+            });
+        }
+
+        const [existingUsers] = await database.execute(
+            `
+                SELECT id
+                FROM usuarios
+                WHERE email = ?
+                LIMIT 1
+            `,
+            [payload.email]
+        );
+
+        if(existingUsers.length > 0) {
+            return res.status(409).json({
+                message: "Este e-mail já está cadastrado."
+            });
+        }
+
+        const encryptedPassword = await bcrypt.hash(payload.password, 10);
+        const encryptedAnswer = await bcrypt.hash(payload.questionAnswer, 10);
+
+        const sql =
+            `
+            INSERT INTO usuarios
+            (
+                nome,
+                email,
+                senha,
+                pergunta_secreta,
+                resposta_secreta,
+                cargo
+            )
+            VALUES (
+                ?, ?, ?, ?, ?, ?
+            );
+        `;
+
+        await database.execute(sql, [
+            payload.name,
+            payload.email,
+            encryptedPassword,
+            payload.secretQuestion,
+            encryptedAnswer,
+            "Admin"
+        ]);
+
+        return res.status(201).json({
+            message: "Administrador cadastrado com sucesso!"
+        });
+
+    } catch (error) {
+
+        console.error("Erro na tentativa de cadastro:", error);
+
+        return res.status(500).json({
+            message: "Erro interno no servidor."
+        });
+
+    }
+
+});
+
 app.patch("/admin/usuarios/:id/bloquear",
         authMiddleware,
         adminMiddleware,
@@ -659,83 +736,6 @@ app.patch("/admin/usuarios/:id/desbloquear",
         return res.status(500).json({
             message: "Erro interno ao desbloquear usuário."
         });
-    }
-
-});
-
-app.post("/cadastrar-admin",
-        authMiddleware,
-        adminMiddleware, 
-        async (req, res) => {
-
-    try {
-
-        const payload = normalizeRegisterData(req.body);
-        const errors = validateRegister(payload);
-
-        if (Object.keys(errors).length > 0) {
-            return res.status(400).json({
-                message: "Dados inválidos.",
-                errors
-            });
-        }
-
-        const [existingUsers] = await database.execute(
-            `
-                SELECT id
-                FROM usuarios
-                WHERE email = ?
-                LIMIT 1
-            `,
-            [payload.email]
-        );
-
-        if(existingUsers.length > 0) {
-            return res.status(409).json({
-                message: "Este e-mail já está cadastrado."
-            });
-        }
-
-        const encryptedPassword = await bcrypt.hash(payload.password, 10);
-        const encryptedAnswer = await bcrypt.hash(payload.questionAnswer, 10);
-
-        const sql =
-            `
-            INSERT INTO usuarios
-            (
-                nome,
-                email,
-                senha,
-                pergunta_secreta,
-                resposta_secreta,
-                cargo
-            )
-            VALUES (
-                ?, ?, ?, ?, ?, ?
-            );
-        `;
-
-        await database.execute(sql, [
-            payload.name,
-            payload.email,
-            encryptedPassword,
-            payload.secretQuestion,
-            encryptedAnswer,
-            "Admin"
-        ]);
-
-        return res.status(201).json({
-            message: "Administrador cadastrado com sucesso!"
-        });
-
-    } catch (error) {
-
-        console.error("Erro na tentativa de cadastro:", error);
-
-        return res.status(500).json({
-            message: "Erro interno no servidor."
-        });
-
     }
 
 });
