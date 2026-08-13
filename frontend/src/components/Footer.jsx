@@ -18,6 +18,15 @@ function Footer() {
 
     const currentYear = new Date().getFullYear();
 
+    const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER;
+    const whatsappMessage = import.meta.env.VITE_WHATSAPP_MESSAGE;
+
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+        whatsappMessage
+    )}`;
+
+    const instagramUrl = import.meta.env.VITE_INSTAGRAM_URL;
+
     async function handleNewsletter(event) {
         event.preventDefault();
 
@@ -83,10 +92,10 @@ function Footer() {
 
                         <div className="footer-logo">
                             <img className="josylinhas-logo"
-                                src={JosylinhasLogo}
-                                width="120"
-                                height="120"
-                                alt="Josylinhas Logotipo" />
+                                 src={JosylinhasLogo}
+                                 width="120"
+                                 height="120"
+                                 alt="Josylinhas Logotipo" />
                         </div>
 
                         <p className="font-small text-muted">
@@ -95,15 +104,11 @@ function Footer() {
 
                         <div className="social-media">
 
-                            <a className="social-icon" href="#">
-                                <span className="bi bi-facebook"></span>
-                            </a>
-
-                            <a className="social-icon" href="#">
+                            <a className="social-icon" href={instagramUrl} target="_blank" rel="noopener noreferrer">
                                 <span className="bi bi-instagram"></span>
                             </a>
 
-                            <a className="social-icon" href="#">
+                            <a className="social-icon" href={whatsappUrl} target="_blank" rel="noopener noreferrer">
                                 <span className="bi bi-whatsapp"></span>
                             </a>
 
