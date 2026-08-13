@@ -6,6 +6,8 @@ import { useAuth } from "../contexts/AuthContext";
 
 import ConfirmModal from "../components/ConfirmModal";
 
+import { showSuccess, showError } from "../utilities/toast";
+
 const roles = {
     superAdmin: "SuperAdmin",
     admin: "Admin",
@@ -33,7 +35,9 @@ const ListaUsuarios = () => {
             const res = await api.get("/admin/usuarios");
             setUsers(res.data.users || []);
         } catch (error) {
-            console.error("Erro ao carregar usuários:", error);
+            showError(error.response?.data?.message ||
+                "Erro ao carregar usuários."
+            );
         } finally {
             setLoading(false);
         }
@@ -101,13 +105,20 @@ const ListaUsuarios = () => {
 
             setActionLoadingId(id);
 
-            await api.patch(`/admin/usuarios/${id}/bloquear`);
+            const res = await api.patch(`/admin/usuarios/${id}/bloquear`);
+
+            showSuccess(res.data.message ||
+                "Usuário bloqueado com sucesso."
+            );
+
             await getUsers();
 
             closeStatusModal();
 
         } catch (error) {
-            console.error("Erro ao bloquear usuário:", error);
+            showError(error.response?.data?.message ||
+                "Erro ao bloquear usuário."
+            );
         } finally {
             setActionLoadingId(null);
         }
@@ -118,13 +129,20 @@ const ListaUsuarios = () => {
 
             setActionLoadingId(id);
 
-            await api.patch(`/admin/usuarios/${id}/desbloquear`);
+            const res = await api.patch(`/admin/usuarios/${id}/desbloquear`);
+
+            showSuccess(res.data.message ||
+                "Usuário desbloqueado com sucesso."
+            );
+
             await getUsers();
 
             closeStatusModal();
 
         } catch (error) {
-            console.error("Erro ao desbloquear usuário:", error);
+            showError(error.response?.data?.message ||
+                "Erro ao desbloquear usuário."
+            );
         } finally {
             setActionLoadingId(null);
         }
