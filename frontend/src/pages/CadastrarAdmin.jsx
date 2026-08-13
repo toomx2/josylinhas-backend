@@ -77,7 +77,7 @@ const CadastrarAdmin = () => {
             if (res.status === 201) {
                 showSuccess(res.data.message);
                 setFormData(initialData);
-                navigate("/login");
+                navigate("/admin/usuarios");
             }
 
         } catch (error) {
