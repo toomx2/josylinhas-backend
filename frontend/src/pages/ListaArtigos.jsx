@@ -22,7 +22,7 @@ const ListaArtigos = () => {
     async function getArticles() {
         try {
             const res = await api.get("/admin/artigos");
-            setArticles(res.data);
+            setArticles(res.data.articles || []);
         } catch (error) {
             console.error("Erro ao carregar artigos:", error);
         } finally {

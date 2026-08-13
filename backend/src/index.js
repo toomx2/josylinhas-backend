@@ -142,7 +142,10 @@ app.get("/admin/artigos",
                 : null
         }));
 
-        return res.status(200).json(articles);
+        return res.status(200).json({
+            message: "Artigos carregados com sucesso.",
+            articles
+        });
 
     } catch (error) {
         console.error("Erro ao buscar artigos no banco:", error);
@@ -258,7 +261,10 @@ app.get("/admin/artigos/:id",
             });
         }
 
-        return res.status(200).json(rows[0]);
+        return res.status(200).json({
+            message: "Artigo carregado com sucesso.",
+            article: rows[0]
+        });
 
     } catch (error) {
         console.error("Erro ao buscar artigo:", error);
@@ -476,7 +482,10 @@ app.get("/admin/usuarios",
             return user;
         });
 
-        return res.status(201).json(users);
+        return res.status(200).json({
+            message: "Usuários carregados com sucesso.",
+            users
+        });
 
     } catch (error) {
         console.error("Erro ao buscar usuários no banco:", error);
@@ -817,12 +826,14 @@ app.get("/me", (req, res) => {
 
     if (!req.session.user) {
         return res.status(401).json({
+            message: "Usuário não autenticado.",
             authenticated: false,
-            message: "Usuário não autenticado."
+            user: null
         });
     }
 
     return res.status(200).json({
+        message: "Usuário autenticado.",
         authenticated: true,
         user: req.session.user
     });

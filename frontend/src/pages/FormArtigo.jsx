@@ -38,13 +38,14 @@ const FormArtigo = () => {
                 setLoading(true);
 
                 const res = await api.get(`/admin/artigos/${id}`);
+                const article = res.data.article;
 
                 const payload = {
-                    title: res.data.title || "",
-                    resume: res.data.resume || "",
-                    content: res.data.content || "",
-                    categories: res.data.categories || "",
-                    status: res.data.status || "Rascunho"
+                    title: article.title || "",
+                    resume: article.resume || "",
+                    content: article.content || "",
+                    categories: article.categories || "",
+                    status: article.status || "Rascunho"
                 };
 
                 setFormData(payload);

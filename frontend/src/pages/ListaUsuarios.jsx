@@ -30,13 +30,8 @@ const ListaUsuarios = () => {
 
     async function getUsers() {
         try {
-
             const res = await api.get("/admin/usuarios");
-
-            if (res.data) {
-                setUsers(res.data);
-            }
-
+            setUsers(res.data.users || []);
         } catch (error) {
             console.error("Erro ao carregar usuários:", error);
         } finally {
