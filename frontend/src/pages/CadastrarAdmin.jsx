@@ -7,6 +7,7 @@ import PasswordInput from "../components/PasswordInput";
 import PasswordStrength from "../components/PasswordStrength";
 
 import { registerValidation } from "../validations/registerValidation";
+import { showSuccess, showError, showWarning } from "../utilities/toast";
 
 const CadastrarAdmin = () => {
 
@@ -23,6 +24,7 @@ const CadastrarAdmin = () => {
 
     const [formData, setFormData] = useState(initialData);
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
 
     const secretQuestions = [
         "Nome da primeira escola que frequentou",
@@ -53,12 +55,14 @@ const CadastrarAdmin = () => {
 
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
+            showWarning("Corrija os campos destacados antes de continuar.");
             return;
         }
 
-        setErrors({});
-
         try {
+
+            setLoading(true);
+            setErrors({});
 
             const payload = {
                 name: formData.name,
@@ -71,12 +75,34 @@ const CadastrarAdmin = () => {
             const res = await api.post("/admin/usuarios", payload);
 
             if (res.status === 201) {
+                showSuccess(res.data.message);
                 setFormData(initialData);
                 navigate("/login");
             }
 
         } catch (error) {
-            console.log("Ocorreu Um Erro:", error);
+
+            const status = error.response?.status;
+            const data = error.response?.data;
+
+            if (status === 400 && data?.errors) {
+                setErrors(data.errors);
+                showWarning(data.message);
+                return;
+            }
+
+            if (status === 409) {
+                setErrors(data.errors);
+                showError(data?.message);
+                return;
+            }
+
+            showError(data?.message ||
+                "Erro ao conectar com o servidor"
+            );
+
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -194,8 +220,10 @@ const CadastrarAdmin = () => {
                 </div>
 
                 <div className="d-flex justify-content-center mt-3">
-                    <button className="josylinhas-btn form-btn" type="submit">
-                        Cadastrar
+                    <button className="josylinhas-btn form-btn" 
+                            type="submit"
+                            disabled={loading}>
+                        {loading ? "Salvando..." : "Cadastrar"}
                     </button>
                 </div>
 
