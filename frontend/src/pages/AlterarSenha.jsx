@@ -7,6 +7,7 @@ import PasswordInput from "../components/PasswordInput";
 import PasswordStrength from "../components/PasswordStrength";
 
 import { resetPasswordValidation } from "../validations/resetPasswordValidation";
+import { showSuccess, showError, showWarning } from "../utilities/toast";
 
 const AlterarSenha = () => {
 
@@ -18,8 +19,8 @@ const AlterarSenha = () => {
     };
 
     const [formData, setFormData] = useState(initialData);
-
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
 
     const { token } = useParams();
 
@@ -44,10 +45,14 @@ const AlterarSenha = () => {
 
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
+            showWarning("Corrija os campos destacados antes de continuar.");
             return;
         }
 
         try {
+
+            setLoading(true);
+            setErrors({});
 
             const res = await api.post(
                 "/alterar-senha",
@@ -58,14 +63,33 @@ const AlterarSenha = () => {
             );
 
             if (res.status === 200) {
+                showSuccess(res.data.message);
                 navigate("/login");
             }
 
         } catch (error) {
-            console.error("Erro na tentativa de alteração de senha:", error);
+
+            const status = error.response?.status;
+            const data = error.response?.data;
+
+            if (status === 400 && data?.errors) {
+                setErrors(data.errors);
+
+                showWarning(data.message ||
+                    "Dados inválidos."
+                );
+
+                return;
+            }
+
+            showError(data?.message ||
+                "Não foi possível alterar a senha."
+            );
+
+        } finally {
+            setLoading(false);
         }
 
-        setErrors({});
     }
 
     return (
@@ -97,8 +121,10 @@ const AlterarSenha = () => {
                                error={errors.repeatPassword} />
 
                 <div className="d-flex justify-content-center mt-3">
-                    <button className="josylinhas-btn form-btn" type="submit">
-                        Alterar
+                    <button className="josylinhas-btn form-btn"
+                            type="submit"
+                            disabled={loading}>
+                        {loading ? "Alterando..." : "Alterar"}
                     </button>
                 </div>
 
