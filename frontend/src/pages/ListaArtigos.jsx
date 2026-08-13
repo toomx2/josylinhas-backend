@@ -3,6 +3,8 @@ import api from "../services/api";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 
+import ConfirmModal from "../components/ConfirmModal";
+
 const articleStatus = {
     arquivado: "Arquivado",
     publicado: "Publicado",
@@ -12,6 +14,8 @@ const articleStatus = {
 const ListaArtigos = () => {
 
     const [articles, setArticles] = useState([]);
+    const [articleToDelete, setArticleToDelete] = useState(null);
+    const [deleting, setDeleting] = useState(false);
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(true);
 
@@ -30,27 +34,44 @@ const ListaArtigos = () => {
         getArticles();
     }, []);
 
-    const handleDelete = async (id, title) => {
-        const confirmed = window.confirm(
-            `Tem certeza que deseja excluir o artigo "${title}"?\n\nEsta ação não poderá ser desfeita.`
-        );
+    function openDeleteModal(article) {
+        setArticleToDelete(article);
+    }
 
-        if (!confirmed) {
+    function closeDeleteModal() {
+        if (deleting) {
+            return;
+        }
+        setArticleToDelete(null);
+    }
+
+    async function handleDelete() {
+
+        if (!articleToDelete) {
             return;
         }
 
         try {
-            await api.delete(`/admin/artigos/${id}`);
+
+            setDeleting(true);
+
+            const res = await api.delete(`/admin/artigos/${articleToDelete.id}`);
 
             setArticles((prevArticles) =>
                 prevArticles.filter(
-                    (article) => article.id !== id
+                    (article) => article.id !== articleToDelete.id
                 )
             );
+
+            setArticleToDelete(null);
+
         } catch (error) {
             console.error("Erro ao excluir artigo:", error);
+        } finally {
+            setDeleting(false);
         }
-    };
+
+    }
 
     function getStatusBadgeClass(status) {
         switch (status) {
@@ -203,7 +224,7 @@ const ListaArtigos = () => {
                                                     </Link>
 
                                                     <button className="btn btn-danger mb-2"
-                                                            onClick={() => handleDelete(article.id, article.title)}
+                                                            onClick={() => openDeleteModal(article)}
                                                             title="Deletar">
                                                         <span className="bi bi-trash-fill" />
                                                     </button>
@@ -228,6 +249,22 @@ const ListaArtigos = () => {
                 </Link>
 
             </section>
+
+            <ConfirmModal
+                show={!!articleToDelete}
+                title="Excluir Artigo"
+                message={
+                    articleToDelete
+                        ? `Tem certeza que deseja excluir o artigo "${articleToDelete.title}"? Essa ação não poderá ser desfeita.`
+                        : ""
+                }
+                confirmText="Excluir"
+                cancelText="Cancelar"
+                confirmVariant="danger"
+                loading={deleting}
+                onConfirm={handleDelete}
+                onCancel={closeDeleteModal}
+            />
         </div>
     );
 
