@@ -5,6 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import PasswordInput from "../components/PasswordInput";
 
 import { loginValidation } from "../validations/loginValidation";
+import { showSuccess, showError, showWarning } from "../utilities/toast";
 
 const Login = () => {
 
@@ -19,6 +20,10 @@ const Login = () => {
 
     const [formData, setFormData] = useState(initialData);
     const [errors, setErrors] = useState({});
+    const [authError, setAuthError] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    const hasAuthError = Boolean(authError);
 
     function getRedirectPathByRole(role) {
         const adminRoles = ["Admin", "SuperAdmin"];
@@ -38,21 +43,27 @@ const Login = () => {
             ...prev,
             [name]: ""
         }));
+
+        setAuthError("");
     }
 
     async function handleSubmit(event) {
         event.preventDefault();
 
+        setAuthError("");
+
         const validationErrors = loginValidation(formData);
 
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
+            showWarning("Corrija os campos destacados antes de continuar.");
             return;
         }
 
-        setErrors({});
-
         try {
+
+            setLoading(true);
+            setErrors({});
 
             const payload = {
                 email: formData.email,
@@ -61,14 +72,48 @@ const Login = () => {
 
             const authUser = await login(payload);
 
+            showSuccess("Login realizado com sucesso!");
+
             navigate(
                 getRedirectPathByRole(authUser?.role),
                 { replace: true }
             );
 
         } catch (error) {
-            console.error("Erro na tentativa de login:", error);
+
+            const status = error.response?.status;
+            const data = error.response?.data;
+
+            if (status === 400 && data?.errors) {
+                setErrors(data.errors);
+                showWarning(data.message ||
+                    "Dados inválidos."
+                );
+                return;
+            }
+
+            if (status === 401) {
+                const message = data?.message || "E-mail ou senha inválidos.";
+                setAuthError(message);
+                showError(message);
+                return;
+            }
+
+            if (status === 403) {
+                showError(data?.message ||
+                    "Usuário sem permissão para acessar."
+                );
+                return;
+            }
+
+            showError(data?.message ||
+                "Erro ao conectar com o servidor."
+            );
+
+        } finally {
+            setLoading(false);
         }
+
     }
 
     return (
@@ -86,7 +131,7 @@ const Login = () => {
                         E-Mail
                     </label>
 
-                    <input className={`form-control ${errors.email ? "is-invalid" : ""}`}
+                    <input className={`form-control ${errors.email || hasAuthError ? "is-invalid" : ""}`}
                            id="email"
                            name="email"
                            type="email"
@@ -107,7 +152,7 @@ const Login = () => {
                                    autoComplete="current-password"
                                    value={formData.password}
                                    onChange={handleChange}
-                                   error={errors.password} />
+                                   error={errors.password || authError} />
 
                     <div className="text-end mt-1">
                         <Link className="form-link" to="/esqueci-senha">
@@ -117,8 +162,10 @@ const Login = () => {
                 </div>
 
                 <div className="d-flex justify-content-center">
-                    <button className="josylinhas-btn form-btn" type="submit">
-                        Logar
+                    <button className="josylinhas-btn form-btn"
+                            type="submit"
+                            disabled={loading}>
+                        {loading ? "Entrando..." : "Logar"}
                     </button>
                 </div>
 
