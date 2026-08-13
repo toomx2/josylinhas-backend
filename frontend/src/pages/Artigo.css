@@ -1,0 +1,44 @@
+.article-page {
+    max-width: 2048px;
+}
+
+.article-header {
+    max-width: 1024px;
+}
+
+.article-category {
+    background-color: rgba(140, 75, 110, 0.1);
+    color: var(--josylinhas-color-primary);
+    font-weight: 600;
+    letter-spacing: 0.025rem;
+    padding: 0.75rem 1rem;
+}
+
+.article-image-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.article-image {
+    background-color: var(--josylinhas-color-light);
+    width: 100%;
+    max-width: 1024px;
+    object-fit: cover;
+    padding: 1rem;
+    border-radius: 1rem;
+    box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.12);
+}
+
+.article-content {
+    color: var(--josylinhas-color-dark);
+    font-size: 1rem;
+    white-space: pre-line;
+    max-width: 1440px;
+}
+
+@media (min-width: 768px) {
+    .article-image {
+        padding: 3rem;
+    }
+}

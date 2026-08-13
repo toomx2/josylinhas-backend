@@ -118,7 +118,7 @@ const Blog = () => {
                                             </div>
 
                                             <div>
-                                                <Link className="josylinhas-btn btn-card" to="#">
+                                                <Link className="josylinhas-btn btn-card" to={`/artigo/${article.slug}`}>
                                                     Ler Mais
                                                 </Link>
                                             </div>
@@ -173,7 +173,7 @@ const Blog = () => {
                                                 </Col>
 
                                                 <Col xs="auto">
-                                                    <Link className="josylinhas-btn btn-card" to="#">
+                                                    <Link className="josylinhas-btn btn-card" to={`/artigo/${article.slug}`}>
                                                         Ler Mais
                                                     </Link>
                                                 </Col>

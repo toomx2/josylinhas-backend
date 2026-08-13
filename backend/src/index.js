@@ -1097,6 +1097,68 @@ app.get("/artigos", async (req, res) => {
 
 });
 
+app.get("/artigos/:slug", async (req, res) => {
+
+    try {
+
+        const { slug } = req.params;
+
+        const [rows] = await database.execute(
+            `
+                SELECT
+                    artigos.id,
+                    artigos.titulo AS title,
+                    artigos.slug,
+                    artigos.resumo AS resume,
+                    artigos.conteudo AS content,
+                    artigos.categorias AS categories,
+                    artigos.imagem_url AS thumbnail,
+                    artigos.publicado_em AS published_on,
+                    usuarios.nome AS author
+                FROM artigos
+                INNER JOIN usuarios
+                    ON usuarios.id = artigos.autor_id
+                WHERE artigos.slug = ?
+                  AND artigos.status = 'Publicado';
+            `,
+            [slug]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({
+                message: "Artigo não encontrado."
+            });
+        }
+
+        const dateTime = new Intl.DateTimeFormat("pt-BR", {
+            timeZone: "America/Sao_Paulo",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        });
+
+        const article = rows[0];
+
+        return res.status(200).json({
+            message: "Artigo carregado com sucesso.",
+            article: {
+                ...article,
+                published_on: article.published_on
+                    ? dateTime.format(new Date(article.published_on))
+                    : null
+            }
+        });
+
+    } catch (error) {
+        console.error("Erro ao buscar artigo público:", error);
+
+        return res.status(500).json({
+            message: "Erro interno no servidor."
+        });
+    }
+
+});
+
 app.use((error, req, res, next) => {
     if (error instanceof multer.MulterError) {
         if (error.code === "LIMIT_FILE_SIZE") {

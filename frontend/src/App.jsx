@@ -92,7 +92,7 @@ const josylinhasRoutes = createBrowserRouter([
             },
 
             {
-                path: "artigo",
+                path: "artigo/:slug",
                 element: <Artigo />
             },
 
