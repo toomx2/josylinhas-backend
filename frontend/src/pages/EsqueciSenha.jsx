@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { forgotPasswordValidation } from "../validations/forgotPasswordValidation";
+import { showSuccess, showError, showWarning } from "../utilities/toast";
 
 const EsqueciSenha = () => {
 
@@ -12,7 +13,7 @@ const EsqueciSenha = () => {
     });
 
     const [errors, setErrors] = useState({});
-    const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(false);
 
     function handleChange(event) {
         const { name, value } = event.target;
@@ -35,20 +36,27 @@ const EsqueciSenha = () => {
 
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
+            showWarning("Corrija os campos destacados antes de continuar.");
             return;
         }
 
         try {
 
+            setLoading(true);
+            setErrors({});
+
             const res = await api.post("/esqueci-senha", formData);
 
-            setMessage(res.data.message);
+            showSuccess(res.data.message);
 
         } catch (error) {
-            console.error("Erro ao solicitar recuperação de senha:", error);
+            showError(error.response?.data?.message ||
+                "Não foi possível enviar o e-mail de recuperação."
+            );
+        } finally {
+            setLoading(false);
         }
 
-        setErrors({});
     }
 
     return (
@@ -60,12 +68,6 @@ const EsqueciSenha = () => {
                 <h1 className="form-title">
                     Esqueci a Senha
                 </h1>
-
-                {message && (
-                    <p className="small text-success mb-3">
-                        {message}
-                    </p>
-                )}
 
                 <p className="text-muted small mb-3">
                     Sem problemas. Insira seu endereço de e-mail e enviaremos um link para criar uma nova senha.
@@ -91,8 +93,10 @@ const EsqueciSenha = () => {
                 </div>
 
                 <div className="d-flex justify-content-center mt-3">
-                    <button className="josylinhas-btn form-btn" type="submit">
-                        Enviar
+                    <button className="josylinhas-btn form-btn"
+                            type="submit"
+                            disabled={loading}>
+                        {loading ? "Enviando..." : "Enviar"}
                     </button>
                 </div>
 
