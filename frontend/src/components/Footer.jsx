@@ -16,6 +16,8 @@ function Footer() {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
+    const currentYear = new Date().getFullYear();
+
     async function handleNewsletter(event) {
         event.preventDefault();
 
@@ -201,7 +203,7 @@ function Footer() {
 
             <div className="copyright-section">
                 <p>
-                    Copyright &copy; 2026 Josylinhas. Todos os Direitos Reservados.
+                    Copyright &copy; {currentYear} Josylinhas. Todos os Direitos Reservados.
                 </p>
             </div>
 
