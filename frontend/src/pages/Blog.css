@@ -26,15 +26,16 @@
 
 .carousel-img {
     display: block;
-    width: 15rem;
+    width: 100vw;
     height: auto;
     object-fit: contain;
+    border-radius: 0.375rem;
 }
 
-@media (min-width: 576px) {
+@media (min-width: 768px) {
     .carousel-img {
-        width: auto;
-        height: 15rem;
+        width: 50vw;
+        height: auto;
     }
 
     .carousel-arrow {

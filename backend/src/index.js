@@ -1046,6 +1046,57 @@ app.post("/alterar-senha", async (req, res) => {
 
 });
 
+app.get("/artigos", async (req, res) => {
+
+    try {
+
+        const [rows] = await database.execute(
+            `
+                SELECT
+                    artigos.id,
+                    artigos.titulo AS title,
+                    artigos.slug,
+                    artigos.resumo AS resume,
+                    artigos.imagem_url AS thumbnail,
+                    artigos.publicado_em AS published_on,
+                    usuarios.nome AS author
+                FROM artigos
+                INNER JOIN usuarios
+                    ON usuarios.id = artigos.autor_id
+                WHERE artigos.status = 'Publicado'
+                ORDER BY artigos.publicado_em DESC;
+            `
+        );
+
+        const dateTime = new Intl.DateTimeFormat("pt-BR", {
+            timeZone: "America/Sao_Paulo",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        });
+
+        const articles = rows.map((article) => ({
+            ...article,
+            published_on: article.published_on
+                ? dateTime.format(new Date(article.published_on))
+                : null
+        }));
+
+        return res.status(200).json({
+            message: "Artigos publicados carregados com sucesso.",
+            articles
+        });
+
+    } catch (error) {
+        console.error("Erro ao buscar artigos públicos:", error);
+
+        return res.status(500).json({
+            message: "Erro interno no servidor."
+        });
+    }
+
+});
+
 app.use((error, req, res, next) => {
     if (error instanceof multer.MulterError) {
         if (error.code === "LIMIT_FILE_SIZE") {

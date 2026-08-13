@@ -1,92 +1,72 @@
 import "./Blog.css";
 
-import { useState } from 'react';
+import api from "../services/api";
+
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 import Carousel from "react-bootstrap/Carousel";
 import Card from "react-bootstrap/Card";
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
+import Col from "react-bootstrap/Col";
+import Row from "react-bootstrap/Row";
 
 import imgExample from "../assets/image-example.png";
 
-import imgSustainableFashion from "../assets/sustainable-fashion.png";
-import imgInclusiveFashion from "../assets/inclusive-fashion.png";
-import imgCarnivalCostumes from "../assets/carnival-costumes.png";
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+function shuffleArray(array) {
+    return [...array].sort(() => Math.random() - 0.5);
+}
 
 const Blog = () => {
 
-    const articles = [
-        {
-            id: 1,
-            title: "Tendência Sustentável: Moda Reciclada em Alta",
-            caption: "Peças feitas com tecidos reaproveitados conquistam passarelas e mostram que estilo e consciência podem andar juntos.",
-            image: imgSustainableFashion,
-            imgAlt: "Ilustração de Moda Sustentável",
-            link: null,
-        },
+    const [articles, setArticles] = useState([]);
+    const [featuredArticles, setFeaturedArticles] = useState([]);
+    const [activeIndex, setActiveIndex] = useState(0);
+    const [loading, setLoading] = useState(true);
 
-        {
-            id: 2,
-            title: null,
-            caption: null,
-            image: null,
-            imgAlt: null,
-            link: null,
-        },
+    async function loadArticles() {
+        try {
 
-        {
-            id: 3,
-            title: null,
-            caption: null,
-            image: null,
-            imgAlt: null,
-            link: null,
-        },
-    ];
+            const res = await api.get("/artigos");
 
-    const slides = [
-        {
-            id: 1,
-            title: "Tendência Sustentável: Moda Reciclada em Alta",
-            caption: "Peças feitas com tecidos reaproveitados conquistam passarelas e mostram que estilo e consciência podem andar juntos.",
-            image: imgSustainableFashion,
-            imgAlt: "Ilustração de Moda Sustentável",
-            link: null,
-        },
+            const data = res.data.articles || [];
 
-        {
-            id: 2,
-            title: "Diversidade nas Passarelas: Moda Inclusiva Ganha Espaço",
-            caption: "Marcas apostam em coleções que celebram todos os corpos, reforçando a beleza da pluralidade.",
-            image: imgInclusiveFashion,
-            imgAlt: "Ilustração de Moda Inclusiva",
-            link: null,
-        },
+            const shuffledArticles = shuffleArray(data);
+            const featured = shuffledArticles.slice(0, 3);
 
-        {
-            id: 3,
-            title: "Figurinos Criativos Transformam o Carnaval em Arte",
-            caption: "Cores vibrantes, brilho e conforto definem as novas tendências de figurinos carnavalescos, unindo expressão cultural e liberdade de movimento.",
-            image: imgCarnivalCostumes,
-            imgAlt: "Ilustração de Figurinos Criativos de Carnaval",
-            link: null,
-        },
-    ];
+            const remainingArticles = data.filter(
+                (article) =>
+                    !featured.some(
+                        (featuredArticle) =>
+                            featuredArticle.id === article.id
+                    )
+            );
 
-    if (!slides || slides.length === 0) {
-        return (
-            <div className="text-center p-3">
-                Nenhum Slide Encontrado.
-            </div>
-        );
+            setFeaturedArticles(featured);
+            setArticles(remainingArticles);
+
+        } catch (error) {
+            console.error("Erro ao carregar artigos:", error);
+        } finally {
+            setLoading(false);
+        }
     }
 
-    const [activeIndex, setActiveIndex] = useState(0);
+    useEffect(() => {
+        loadArticles();
+    }, []);
 
-    const handleSelect = (selectedIndex) => {
+    function handleSelect(selectedIndex) {
         setActiveIndex(selectedIndex);
-    };
+    }
+
+    function getThumbnailUrl(thumbnail) {
+        if (!thumbnail) {
+            return imgExample;
+        }
+        return `${backendUrl}/uploads/articles/thumbnails/${thumbnail}`;
+    }
 
     return (
         <section className="container-fluid p-3">
@@ -101,48 +81,58 @@ const Blog = () => {
                     Destaques
                 </h2>
 
-                <Carousel activeIndex={activeIndex}
-                          onSelect={handleSelect}
-                          prevIcon={
-                            <span className="bi bi-chevron-left carousel-arrow" aria-hidden="true" />
-                          }
-                          prevLabel="Anterior"
-                          nextIcon={
-                            <span className="bi bi-chevron-right carousel-arrow" aria-hidden="true" />
-                          }
-                          nextLabel="Próximo"
-                          indicators={false}
-                          interval={null}>
+                {
+                    loading ? (
+                        <p className="text-center p-3">
+                            Carregando Destaques...
+                        </p>
+                    ) : featuredArticles.length > 0 ? (
+                        <Carousel activeIndex={activeIndex}
+                                  onSelect={handleSelect}
+                                  prevIcon={
+                                    <span className="bi bi-chevron-left carousel-arrow" aria-hidden="true" />
+                                  }
+                                  prevLabel="Anterior"
+                                  nextIcon={
+                                    <span className="bi bi-chevron-right carousel-arrow" aria-hidden="true" />
+                                  }
+                                  nextLabel="Próximo"
+                                  indicators={false}
+                                  interval={null}>
+                            {featuredArticles.map((article) => {
+                                return (
+                                    <Carousel.Item key={article.id}>
+                                        <div className="d-flex flex-column flex-grow-1 align-items-center">
+                                            <div className="text-center">
+                                                <h3 className="fs-3 fw-normal mb-2">
+                                                    {article.title || "Título"}
+                                                </h3>
 
-                    {slides.map((slide, index) => {
-                        return (
-                            <Carousel.Item key={index}>
-                                <div className="d-flex flex-column align-items-center">
-                                    <div className="text-center">
-                                        <h3 className="fs-4 fw-normal mb-2">
-                                            {slide.title || "Título"}
-                                        </h3>
+                                                <p className="text-muted mb-3">
+                                                    {article.resume || "Legenda"}
+                                                </p>
+                                            </div>
 
-                                        <p className="text-muted mb-3">
-                                            {slide.caption || "Legenda"}
-                                        </p>
-                                    </div>
+                                            <div className="image-section my-3">
+                                                <img className="carousel-img shadow" src={getThumbnailUrl(article.thumbnail)} alt={`Imagem do artigo ${article.title}`} />
+                                            </div>
 
-                                    <div className="image-section my-3">
-                                        <img className="carousel-img" src={slide.image || ImageExample} alt={slide.imgAlt || "Texto Alternativo"} />
-                                    </div>
-
-                                    <div>
-                                        <Link className="josylinhas-btn btn-card" to={slide.link || "#"}>
-                                            Ler Mais
-                                        </Link>
-                                    </div>
-                                </div>
-                            </Carousel.Item>
-                        );
-                    })}
-
-                </Carousel>
+                                            <div>
+                                                <Link className="josylinhas-btn btn-card" to="#">
+                                                    Ler Mais
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </Carousel.Item>
+                                );
+                            })}
+                        </Carousel>
+                    ) : (
+                        <p className="text-center text-muted py-4">
+                            Nenhum artigo publicado em destaque no momento.
+                        </p>
+                    )
+                }
             </section>
 
             <section>
@@ -152,37 +142,62 @@ const Blog = () => {
                 </h2>
 
                 <ul>
-                    {articles.map((article, index) => (
-                        <li key={index}>
-                            <Card className="card-background p-3 mb-3" as={"article"}>
-                                <Row className="justify-content-center align-items-center flex-grow-1 gap-3">
-                                    <Col xs="auto">
-                                        <Card.Img className="card-img-custom" src={article.image || imgExample} alt={article.imgAlt || "Texto Alternativo"} />
-                                    </Col>
+                    {
+                        loading ? (
+                            <p className="text-center py-4">
+                                Carregando Artigos...
+                            </p>
+                        ) : articles.length > 0 ? (
+                            <ul className="list-unstyled">
+                                {articles.map((article) => (
+                                    <li key={article.id}>
+                                        <Card className="card-background p-3 mb-3" as={"article"}>
+                                            <Row className="justify-content-center align-items-center flex-grow-1 gap-3">
+                                                <Col xs="auto">
+                                                    <Card.Img className="card-img-custom"
+                                                              src={getThumbnailUrl(article.thumbnail)}
+                                                              alt={`Imagem do artigo ${article.title}`} />
+                                                </Col>
 
-                                    <Col className="flex-grow-1 p-0" xs="auto" lg={8}>
-                                        <Card.Body>
+                                                <Col className="flex-grow-1 p-0" xs="auto" lg={8}>
+                                                    <Card.Body>
+                                                        <Card.Title>
+                                                            {article.title}
+                                                        </Card.Title>
 
-                                            <Card.Title>
-                                                {article.title || "Título"}
-                                            </Card.Title>
+                                                        <Card.Text>
+                                                            {article.resume}
+                                                        </Card.Text>
 
-                                            <Card.Text>
-                                                {article.caption || "Legenda"}
-                                            </Card.Text>
+                                                    </Card.Body>
+                                                </Col>
 
-                                        </Card.Body>
-                                    </Col>
+                                                <Col xs="auto">
+                                                    <Link className="josylinhas-btn btn-card" to="#">
+                                                        Ler Mais
+                                                    </Link>
+                                                </Col>
+                                            </Row>
 
-                                    <Col xs="auto">
-                                        <Link className="josylinhas-btn btn-card" to={article.link || "#"}>
-                                            Ler Mais
-                                        </Link>
-                                    </Col>
-                                </Row>
-                            </Card>
-                        </li>
-                    ))}
+                                            <Row>
+                                                {
+                                                    article.author && 
+                                                    <Card.Text className="d-flex justify-content-center justify-content-md-end gap-1 text-muted small pt-3">
+                                                        Por<strong>{article.author}</strong>
+                                                    </Card.Text>
+                                                }
+                                            </Row>
+                                        </Card>
+                                    </li>
+                                ))}
+                            </ul>
+
+                        ) : (
+                            <p className="alert alert-secondary text-center text-muted py-4">
+                                Nenhum artigo publicado no momento.
+                            </p>
+                        )
+                    }
                 </ul>
 
             </section>
