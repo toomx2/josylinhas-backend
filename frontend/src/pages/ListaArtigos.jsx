@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 
 import ConfirmModal from "../components/ConfirmModal";
 
+import { showSuccess, showError } from "../utilities/toast";
+
 const articleStatus = {
     arquivado: "Arquivado",
     publicado: "Publicado",
@@ -24,7 +26,9 @@ const ListaArtigos = () => {
             const res = await api.get("/admin/artigos");
             setArticles(res.data.articles || []);
         } catch (error) {
-            console.error("Erro ao carregar artigos:", error);
+            showError(error.response?.data?.message ||
+                "Erro ao carregar artigos."
+            );
         } finally {
             setLoading(false);
         }
@@ -63,9 +67,15 @@ const ListaArtigos = () => {
                 )
             );
 
+            showSuccess(res.data.message ||
+                "Artigo removido com sucesso."
+            );
             setArticleToDelete(null);
 
         } catch (error) {
+            showError(error.response?.data?.message ||
+                "Erro ao remover artigo."
+            );
             console.error("Erro ao excluir artigo:", error);
         } finally {
             setDeleting(false);
