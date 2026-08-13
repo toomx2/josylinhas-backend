@@ -1,10 +1,71 @@
 import "./Footer.css";
 
+import api from "../services/api";
+
+import { useState } from "react";
 import { Link } from "react-router-dom";
+
+import { newsletterValidation } from "../validations/newsletterValidation";
+import { showSuccess, showError, showWarning } from "../utilities/toast";
 
 import JosylinhasLogo from "../assets/josylinhas-logo.png";
 
 function Footer() {
+
+    const [email, setEmail] = useState("");
+    const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+
+    async function handleNewsletter(event) {
+        event.preventDefault();
+
+        const validationErrors = newsletterValidation({ email });
+
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            showWarning("Verifique o e-mail informado.");
+            return;
+        }
+
+        try {
+
+            setLoading(true);
+            setErrors({});
+
+            const res = await api.post("/newsletter", {
+                email
+            });
+
+            if (res.status === 201) {
+                showSuccess(res.data.message);
+                setEmail("");
+            }
+
+        } catch (error) {
+
+            const status = error.response?.status;
+            const data = error.response?.data;
+
+            if (status === 400 && data?.errors) {
+                setErrors(data.errors);
+                showWarning(data.message);
+                return;
+            }
+
+            if (status === 409) {
+                setErrors({
+                    email: data?.message
+                });
+                showWarning(data?.message);
+                return;
+            }
+
+            showError(data?.message || "Erro ao cadastrar e-mail.");
+
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <footer className="josylinhas-footer">
@@ -104,28 +165,31 @@ function Footer() {
                                 Insira seu e-mail para receber notificações sobre novas postagens do blog!
                             </p>
 
-                            <form>
-
+                            <form onSubmit={handleNewsletter}>
                                 <div className="input-group">
 
-                                    <input
-                                        className="form-control"
-                                        id="email"
-                                        name="email"
-                                        type="email"
-                                        placeholder="E-Mail"
-                                        autoComplete="email"
-                                    />
+                                    <input className={`form-control ${errors.email ? "is-invalid" : ""}`}
+                                           id="email"
+                                           name="email"
+                                           type="email"
+                                           placeholder="E-Mail"
+                                           autoComplete="email"
+                                           value={email}
+                                           onChange={(event) => setEmail(event.target.value)} />
 
-                                    <button
-                                        className="josylinhas-btn btn-primary input-group-text"
-                                        type="submit"
-                                    >
-                                        <span className="bi bi-envelope"></span>
+                                    <button className="josylinhas-btn btn-primary input-group-text"
+                                            type="submit"
+                                            disabled={loading}>
+                                        <span className={loading ? "spinner-border spinner-border-sm" : "bi bi-envelope"}></span>
                                     </button>
 
                                 </div>
 
+                                {errors.email && (
+                                    <p className="small text-danger mt-2 mb-0">
+                                        {errors.email}
+                                    </p>
+                                )}
                             </form>
 
                         </div>

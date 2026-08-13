@@ -23,6 +23,9 @@ import { validateLogin, normalizeLoginData } from "./validations/loginValidation
 import { validateForgotPassword, normalizeForgotPasswordData } from "./validations/forgotPasswordValidation.js";
 import { validateResetPassword, normalizeResetPasswordData } from "./validations/resetPasswordValidation.js";
 
+import { validateNewsletter, normalizeNewsletterData } from "./validations/newsletterValidation.js";
+import { sendWelcomeEmail } from "./services/newsletterService.js";
+
 import { generateSlug } from "./utilities/generateSlug.js";
 
 dotenv.config();
@@ -1151,6 +1154,71 @@ app.get("/artigos/:slug", async (req, res) => {
 
     } catch (error) {
         console.error("Erro ao buscar artigo público:", error);
+
+        return res.status(500).json({
+            message: "Erro interno no servidor."
+        });
+    }
+
+});
+
+app.post("/newsletter", async (req, res) => {
+
+    try {
+
+        const payload = normalizeNewsletterData(req.body);
+        const errors = validateNewsletter(payload);
+
+        if (Object.keys(errors).length > 0) {
+            return res.status(400).json({
+                message: "Insira um e-mail.",
+                errors
+            });
+        }
+
+        const [rows] = await database.query(
+            `
+                SELECT id
+                FROM newsletter
+                WHERE email = ?
+                LIMIT 1
+            `,
+            [payload.email]
+        );
+
+        if (rows.length > 0) {
+            return res.status(409).json({
+                message: "Este e-mail já está inscrito na newsletter."
+            });
+        }
+
+        try {
+            await database.query(
+                `
+                    INSERT INTO newsletter (email)
+                    VALUES (?)
+                `,
+                [payload.email]
+            );
+        } catch (insertError) {
+            if (insertError.code === "ER_DUP_ENTRY") {
+                return res.status(409).json({
+                    message: "Este e-mail já está inscrito na newsletter."
+                });
+            }
+            throw insertError;
+        }
+
+        res.status(201).json({
+            message: "Inscrição realizada com sucesso!"
+        });
+
+        sendWelcomeEmail(payload.email).catch((emailError) => {
+            console.error("Erro ao enviar e-mail de boas-vindas:", emailError);
+        });
+
+    } catch (error) {
+        console.error("Erro ao se inscrever na newsletter:", error);
 
         return res.status(500).json({
             message: "Erro interno no servidor."
