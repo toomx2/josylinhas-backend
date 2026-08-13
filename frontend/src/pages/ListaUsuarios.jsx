@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
+import ConfirmModal from "../components/ConfirmModal";
+
 const roles = {
     superAdmin: "SuperAdmin",
     admin: "Admin",
@@ -19,6 +21,8 @@ const ListaUsuarios = () => {
 
     const [users, setUsers] = useState([]);
     const [search, setSearch] = useState("");
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedAction, setSelectedAction] = useState(null);
     const [actionLoadingId, setActionLoadingId] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -43,6 +47,34 @@ const ListaUsuarios = () => {
     useEffect(() => {
         getUsers();
     }, []);
+
+    function openStatusModal(targetUser, action) {
+        setSelectedUser(targetUser);
+        setSelectedAction(action);
+    }
+
+    function closeStatusModal() {
+        if (actionLoadingId) {
+            return;
+        }
+        setSelectedUser(null);
+        setSelectedAction(null);
+    }
+
+    function handleConfirmStatusChange() {
+        if (!selectedUser || !selectedAction) {
+            return;
+        }
+
+        if (selectedAction === "block") {
+            handleBlock(selectedUser.id);
+            return;
+        }
+
+        if (selectedAction === "unblock") {
+            handleUnblock(selectedUser.id);
+        }
+    }
 
     function canChangeStatus(targetUser) {
         if (!user) {
@@ -77,6 +109,8 @@ const ListaUsuarios = () => {
             await api.patch(`/admin/usuarios/${id}/bloquear`);
             await getUsers();
 
+            closeStatusModal();
+
         } catch (error) {
             console.error("Erro ao bloquear usuário:", error);
         } finally {
@@ -91,6 +125,8 @@ const ListaUsuarios = () => {
 
             await api.patch(`/admin/usuarios/${id}/desbloquear`);
             await getUsers();
+
+            closeStatusModal();
 
         } catch (error) {
             console.error("Erro ao desbloquear usuário:", error);
@@ -274,7 +310,7 @@ const ListaUsuarios = () => {
                                                         canChangeStatus(user) && (
                                                             <button className={user.status === userStatus.active ? "btn btn-danger" : "btn btn-success"}
                                                                     type="button"
-                                                                    onClick={() => user.status === userStatus.active ? handleBlock(user.id) : handleUnblock(user.id)}
+                                                                    onClick={() => openStatusModal(user, user.status === userStatus.active ? "block" : "unblock")}
                                                                     title={user.status === userStatus.active ? "Bloquear" : "Desbloquear"}
                                                                     disabled={actionLoadingId === user.id}>
                                                                 <span className={
@@ -310,6 +346,36 @@ const ListaUsuarios = () => {
                 </Link>
 
             </section>
+
+            <ConfirmModal
+                show={Boolean(selectedUser)}
+                title={
+                    selectedAction === "block"
+                        ? "Bloquear usuário"
+                        : "Desbloquear usuário"
+                }
+                message={
+                    selectedUser
+                        ? selectedAction === "block"
+                            ? `Tem certeza que deseja bloquear o usuário "${selectedUser.name}"? Ele não conseguirá acessar o sistema até ser desbloqueado.`
+                            : `Tem certeza que deseja desbloquear o usuário "${selectedUser.name}"? Ele voltará a poder acessar o sistema.`
+                        : ""
+                }
+                confirmText={
+                    selectedAction === "block"
+                        ? "Bloquear"
+                        : "Desbloquear"
+                }
+                cancelText="Cancelar"
+                confirmVariant={
+                    selectedAction === "block"
+                        ? "danger"
+                        : "success"
+                }
+                loading={actionLoadingId === selectedUser?.id}
+                onConfirm={handleConfirmStatusChange}
+                onCancel={closeStatusModal}
+            />
         </div>
     );
 
