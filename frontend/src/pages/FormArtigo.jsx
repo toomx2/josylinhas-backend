@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 
 import { articleValidation } from "../validations/articleValidation";
+import { showSuccess, showError, showWarning } from "../utilities/toast";
 
 const initialData = {
     title: "",
@@ -51,7 +52,9 @@ const FormArtigo = () => {
                 setFormData(payload);
 
             } catch (error) {
-                console.error("Erro ao carregar artigo:", error);
+                showError(error.response?.data?.message ||
+                    "Erro ao carregar artigo."
+                );
             } finally {
                 setLoading(false);
             }
@@ -80,12 +83,14 @@ const FormArtigo = () => {
 
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
+            showWarning("Corrija os campos destacados antes de continuar.");
             return;
         }
 
         try {
-            setErrors({});
+
             setLoading(true);
+            setErrors({});
 
             const payload = new FormData();
 
@@ -99,31 +104,38 @@ const FormArtigo = () => {
                 payload.append("thumbnail", thumbnail);
             }
 
-            if (isEditing) {
-                await api.put(`/admin/artigos/${id}`, payload, {
+            const res = isEditing
+                ? await api.put(`/admin/artigos/${id}`, payload, {
+                    headers: {
+                        "Content-Type": "multipart/form-data"
+                    }
+                })
+                : await api.post("/admin/artigos", payload, {
                     headers: {
                         "Content-Type": "multipart/form-data"
                     }
                 });
-            } else {
-                await api.post("/admin/artigos", payload, {
-                    headers: {
-                        "Content-Type": "multipart/form-data"
-                    }
-                });
-            }
+
+            showSuccess(res.data.message);
 
             navigate("/admin/artigos");
 
         } catch (error) {
+
             if (error.response?.status === 400) {
-                setErrors(error.response.data.errors || {});
+                setErrors(error.response.data.errors || 
+                    {}
+                );
+                showError(error.response?.data?.message ||
+                    "Erro ao salvar artigo."
+                );
                 return;
             }
-            console.error("Erro ao salvar artigo:", error);
+
         } finally {
             setLoading(false);
         }
+
     }
 
     function handleThumbnailChange(event) {
