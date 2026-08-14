@@ -33,15 +33,5 @@ export function registerValidation(data) {
         errors.confirmPassword = "As senhas não correspondem.";
     }
 
-    if (!isRequired(data.secretQuestion)) {
-        errors.secretQuestion = "Por favor, selecione uma pergunta.";
-    }
-
-    if (!isRequired(data.questionAnswer)) {
-        errors.questionAnswer = "O campo resposta secreta é obrigatório.";
-    } else if (!isRequired(data.secretQuestion)) {
-        errors.questionAnswer = "Nenhuma pergunta foi selecionada.";
-    }
-
     return errors;
 }

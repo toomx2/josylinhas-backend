@@ -12,9 +12,7 @@ const EditarPerfil = () => {
         name: "",
         email: "",
         password: "",
-        confirmPassword: "",
-        secretQuestion: "",
-        questionAnswer: ""
+        confirmPassword: ""
     };
 
     const [formData, setFormData] = useState(initialData);
@@ -112,38 +110,6 @@ const EditarPerfil = () => {
                                value={formData.confirmPassword}
                                onChange={handleChange}
                                error={errors.confirmPassword} />
-
-                <div>
-                    <label className="form-label" htmlFor="secret-question">
-                        Pergunta Secreta
-                    </label>
-
-                    <input className="form-control"
-                           id="secret-question"
-                           name="secretQuestion"
-                           type="text"
-                           value={formData.secretQuestion}
-                           onChange={handleChange}
-                           disabled />
-                </div>
-
-                <div>
-                    <label className="form-label" htmlFor="question-answer">
-                        Resposta Secreta *
-                    </label>
-
-                    <input className={`form-control ${errors.questionAnswer ? "is-invalid" : ""}`}
-                           id="question-answer"
-                           name="questionAnswer"
-                           type="text"
-                           value={formData.questionAnswer}
-                           onChange={handleChange} />
-
-                    {errors.questionAnswer &&
-                        <p className="small text-danger">
-                            {errors.questionAnswer}
-                        </p>}
-                </div>
 
                 <div className="d-flex justify-content-center mt-3">
                     <button className="josylinhas-btn form-btn" type="submit">

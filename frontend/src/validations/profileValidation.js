@@ -33,9 +33,5 @@ export function profileValidation(data) {
         errors.confirmPassword = "As senhas não correspondem.";
     }
 
-    if (!isRequired(data.questionAnswer)) {
-        errors.questionAnswer = "O campo resposta secreta é obrigatório.";
-    }
-
     return errors;
 }

@@ -534,7 +534,6 @@ app.post("/admin/usuarios",
         }
 
         const encryptedPassword = await bcrypt.hash(payload.password, 10);
-        const encryptedAnswer = await bcrypt.hash(payload.questionAnswer, 10);
 
         const sql =
             `
@@ -543,12 +542,10 @@ app.post("/admin/usuarios",
                 nome,
                 email,
                 senha,
-                pergunta_secreta,
-                resposta_secreta,
                 cargo
             )
             VALUES (
-                ?, ?, ?, ?, ?, ?
+                ?, ?, ?, ?
             );
         `;
 
@@ -556,8 +553,6 @@ app.post("/admin/usuarios",
             payload.name,
             payload.email,
             encryptedPassword,
-            payload.secretQuestion,
-            encryptedAnswer,
             "Admin"
         ]);
 

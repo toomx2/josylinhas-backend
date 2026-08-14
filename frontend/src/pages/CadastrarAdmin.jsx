@@ -17,22 +17,12 @@ const CadastrarAdmin = () => {
         name: "",
         email: "",
         password: "",
-        confirmPassword: "",
-        secretQuestion: "",
-        questionAnswer: ""
+        confirmPassword: ""
     };
 
     const [formData, setFormData] = useState(initialData);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
-
-    const secretQuestions = [
-        "Nome da primeira escola que frequentou",
-        "Seu apelido de infância que sua família usava",
-        "Nome do primeiro animal de estimação",
-        "Título do seu livro favorito",
-        "Nome da primeira empresa onde trabalhou"
-    ];
 
     function handleChange(event) {
         const { name, value } = event.target;
@@ -67,9 +57,7 @@ const CadastrarAdmin = () => {
             const payload = {
                 name: formData.name,
                 email: formData.email,
-                password: formData.password,
-                secretQuestion: formData.secretQuestion,
-                questionAnswer: formData.questionAnswer
+                password: formData.password
             };
 
             const res = await api.post("/admin/usuarios", payload);
@@ -171,53 +159,6 @@ const CadastrarAdmin = () => {
                                value={formData.confirmPassword}
                                onChange={handleChange}
                                error={errors.confirmPassword} />
-
-                <div>
-                    <label className="form-label" htmlFor="secret-question">
-                        Pergunta Secreta
-                    </label>
-
-                    <select className={`form-control ${errors.secretQuestion ? "is-invalid" : ""}`}
-                            id="secret-question"
-                            name="secretQuestion"
-                            value={formData.secretQuestion}
-                            onChange={handleChange}>
-
-                        <option value="">
-                            Selecione
-                        </option>
-
-                        {secretQuestions.map((question, index) => (
-                            <option key={index} value={question}>
-                                {question}
-                            </option>
-                        ))}
-
-                    </select>
-
-                    {errors.secretQuestion &&
-                        <p className="small text-danger">
-                            {errors.secretQuestion}
-                        </p>}
-                </div>
-
-                <div>
-                    <label className="form-label" htmlFor="question-answer">
-                        Resposta Secreta *
-                    </label>
-
-                    <input className={`form-control ${errors.questionAnswer ? "is-invalid" : ""}`}
-                           id="question-answer"
-                           name="questionAnswer"
-                           type="text"
-                           value={formData.questionAnswer}
-                           onChange={handleChange} />
-
-                    {errors.questionAnswer &&
-                        <p className="small text-danger">
-                            {errors.questionAnswer}
-                        </p>}
-                </div>
 
                 <div className="d-flex justify-content-center mt-3">
                     <button className="josylinhas-btn form-btn" 

@@ -4,9 +4,7 @@ export function normalizeRegisterData(data) {
     return {
         name: data.name?.trim(),
         email: data.email?.trim().toLowerCase(),
-        password: data.password,
-        secretQuestion: data.secretQuestion?.trim(),
-        questionAnswer: data.questionAnswer?.trim()
+        password: data.password
     };
 }
 
@@ -41,16 +39,6 @@ export function validateRegister(data) {
         errors.password = "A senha deve conter pelo menos uma letra maiúscula.";
     } else if (!hasSpecialCharacter(data.password)) {
         errors.password = "A senha deve conter pelo menos um caractere especial.";
-    }
-
-    if (!isRequired(data.secretQuestion)) {
-        errors.secretQuestion = "Por favor, selecione uma pergunta.";
-    }
-
-    if (!isRequired(data.questionAnswer)) {
-        errors.questionAnswer = "O campo resposta secreta é obrigatório.";
-    } else if (!minLength(data.questionAnswer, 3)) {
-        errors.questionAnswer = "A resposta secreta deve ter pelo menos três caracteres.";
     }
 
     return errors;
