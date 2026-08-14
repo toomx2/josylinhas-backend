@@ -187,6 +187,12 @@ const FormArtigo = () => {
                            type="file"
                            accept="image/*"
                            onChange={handleThumbnailChange} />
+
+                    {errors.thumbnail && (
+                        <div className="invalid-feedback">
+                            {errors.thumbnail}
+                        </div>
+                    )}
                 </div>
 
                 <div>
