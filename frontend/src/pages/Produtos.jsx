@@ -11,29 +11,25 @@ import imgCostumePicture02 from "../assets/costume-picture-2.png";
 import imgCostumePicture03 from "../assets/costume-picture-4.png";
 import imgCostumeBackground from "../assets/background-costume.png";
 
+const products = [
+    {
+        id: 1,
+        title: "Estilo Único",
+        description: "Descubra a arte da costura em nosso ateliê, celebrando a diversidade através de looks únicos.",
+        image: imgCostumePicture02,
+        imgAlt: "Estilo Único"
+    },
+
+    {
+        id: 2,
+        title: "Moda Inclusiva",
+        description: "Moda inclusiva é vestir diversidade com elegância. Em nosso atelier, cada corpo é bem-vindo.",
+        image: imgCostumePicture03,
+        imgAlt: "Moda Inclusiva"
+    },
+];
+
 const Produtos = () => {
-
-    const products = [
-        {
-            id: 1,
-            title: "Estilo Único",
-            subtitle: "Design",
-            description: "Descubra a arte da costura em nosso ateliê, celebrando a diversidade através de looks únicos",
-            image: imgCostumePicture02,
-            imgAlt: "Estilo Único",
-            link: null,
-        },
-
-        {
-            id: 2,
-            title: "Moda Inclusiva",
-            subtitle: "Conceito",
-            description: "Moda inclusiva é vestir diversidade com elegância no Ateliê Josylinhas, cada corpo é bem-vindo",
-            image: imgCostumePicture03,
-            imgAlt: "Moda Inclusiva",
-            link: null,
-        },
-    ];
 
     const scrollContainerReference = useRef();
     const scrollTopicsReference = useRef([]);
@@ -138,10 +134,6 @@ const Produtos = () => {
                                                 <Card.Title>
                                                     {product.title}
                                                 </Card.Title>
-
-                                                <Card.Subtitle className="text-muted">
-                                                    {product.subtitle}
-                                                </Card.Subtitle>
                                             </Card.Header>
 
                                             <Card.Body className="d-flex flex-column gap-3">
@@ -150,12 +142,6 @@ const Produtos = () => {
                                                     {product.description}
                                                 </Card.Text>
                                             </Card.Body>
-
-                                            <Card.Footer className="d-flex justify-content-center">
-                                                <Card.Link className="josylinhas-btn btn-card" to={product.link}>
-                                                    Ler Mais
-                                                </Card.Link>
-                                            </Card.Footer>
                                         </Card>
                                     </Col>
                                 </li>
