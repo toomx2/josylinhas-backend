@@ -95,7 +95,7 @@ const CadastrarAdmin = () => {
     }
 
     return (
-        <div className="admin-background d-flex flex-grow-1 justify-content-center align-items-center">
+        <div className="d-flex flex-grow-1 justify-content-center align-items-center">
 
             <form className="form-card shadow my-3 mx-2"
                   onSubmit={handleSubmit}>
