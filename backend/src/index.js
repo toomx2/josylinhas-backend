@@ -23,6 +23,8 @@ import { validateLogin, normalizeLoginData } from "./validations/loginValidation
 import { validateForgotPassword, normalizeForgotPasswordData } from "./validations/forgotPasswordValidation.js";
 import { validateResetPassword, normalizeResetPasswordData } from "./validations/resetPasswordValidation.js";
 
+import { validateProfileData, normalizeProfileData } from "./validations/profileValidation.js";
+
 import { validateNewsletter, normalizeNewsletterData } from "./validations/newsletterValidation.js";
 import { sendWelcomeEmail } from "./services/newsletterService.js";
 
@@ -1036,6 +1038,181 @@ app.post("/alterar-senha", async (req, res) => {
 
     } catch (error) {
         console.error("Erro ao alterar senha:", error);
+
+        return res.status(500).json({
+            message: "Erro interno no servidor."
+        });
+    }
+
+});
+
+app.get("/perfil",
+       authMiddleware,
+       async (req, res) => {
+
+    try {
+
+        const userId = req.session.user.id;
+
+        const [rows] = await database.execute(
+            `
+            SELECT
+                nome AS name,
+                email
+            FROM usuarios
+            WHERE id = ?
+            LIMIT 1;
+            `,
+            [userId]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({
+                message: "Usuário não encontrado."
+            });
+        }
+
+        return res.status(200).json(rows[0]);
+
+    } catch (error) {
+        console.error("Erro ao buscar perfil:", error);
+
+        return res.status(500).json({
+            message: "Erro interno no servidor."
+        });
+    }
+
+});
+
+app.put("/perfil",
+       authMiddleware,
+       async (req, res) => {
+
+    try {
+
+        const userId = req.session.user.id;
+
+        const payload = normalizeProfileData(req.body);
+        const errors = validateProfileData(payload);
+
+        if (Object.keys(errors).length > 0) {
+            return res.status(400).json({
+                message: "Dados inválidos.",
+                errors
+            });
+        }
+
+        const [userRows] = await database.execute(
+            `
+            SELECT
+                id,
+                senha
+            FROM usuarios
+            WHERE id = ?
+            LIMIT 1;
+            `,
+            [userId]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(404).json({
+                message: "Usuário não encontrado."
+            });
+        }
+
+        const [emailRows] = await database.execute(
+            `
+            SELECT id
+            FROM usuarios
+            WHERE email = ?
+                AND id <> ?
+            LIMIT 1;
+            `,
+            [payload.email, userId]
+        );
+
+        if (emailRows.length > 0) {
+            return res.status(400).json({
+                message: "Dados inválidos.",
+                errors: {
+                    email: "Este e-mail já está em uso."
+                }
+            });
+        }
+
+        const wantsToChangePassword =
+            payload.currentPassword ||
+            payload.password ||
+            payload.confirmPassword;
+
+        if (wantsToChangePassword) {
+
+            const isCurrentPasswordValid = await bcrypt.compare(
+                payload.currentPassword,
+                userRows[0].senha
+            );
+
+            if (!isCurrentPasswordValid) {
+                return res.status(400).json({
+                    message: "Dados inválidos.",
+                    errors: {
+                        currentPassword: "Senha atual incorreta."
+                    }
+                });
+            }
+
+            const hashedPassword = await bcrypt.hash(
+                payload.password,
+                10
+            );
+
+            await database.execute(
+                `
+                UPDATE usuarios
+                SET
+                    nome = ?,
+                    email = ?,
+                    senha = ?
+                WHERE id = ?;
+                `,
+                [
+                    payload.name,
+                    payload.email,
+                    hashedPassword,
+                    userId
+                ]
+            );
+
+        } else {
+
+            await database.execute(
+                `
+                UPDATE usuarios
+                SET
+                    nome = ?,
+                    email = ?
+                WHERE id = ?;
+                `,
+                [
+                    payload.name,
+                    payload.email,
+                    userId
+                ]
+            );
+
+        }
+
+        if (req.session.user) {
+            req.session.user.name = payload.name;
+            req.session.user.email = payload.email;
+        }
+
+        return res.status(200).json({
+            message: "Perfil atualizado com sucesso."
+        });
+
+    } catch (error) {
+        console.error("Erro ao atualizar perfil:", error);
 
         return res.status(500).json({
             message: "Erro interno no servidor."
